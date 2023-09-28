@@ -4,8 +4,6 @@ import io.github.thatsmusic99.hitwtracker.gui.tab.EntryListTab;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.tab.GridScreenTab;
-import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
@@ -22,8 +20,8 @@ public class MiscStatisticsTab extends EntryListTab<MiscStatisticsTab.Entry> {
         super(client, parent, top, bottom, 10);
 
         GridWidget.Adder adder = this.grid.setColumnSpacing(100).createAdder(2);
-        adder.add(STATISTIC_COLUMN = of("", (g1, g2) -> 0));
-        adder.add(VALUE_COLUMN = of("", (g1, g2) -> 0));
+        adder.add(STATISTIC_COLUMN = of("Statistic", (g1, g2) -> 0));
+        adder.add(VALUE_COLUMN = of("Value", (g1, g2) -> 0));
     }
 
     @Override

@@ -16,7 +16,7 @@ import java.util.Comparator;
 
 public class DayStatisticsTab extends EntryListTab<DayStatisticsTab.Entry> {
 
-    private final @NotNull TextWidget DATE_COLUMN;
+    private final @NotNull Column DATE_COLUMN;
     private final @NotNull TextWidget GAMES_COLUMN;
     private final @NotNull TextWidget AVG_PLACE_COLUMN;
     private final @NotNull TextWidget TIE_COUNT_COLUMN;
@@ -45,7 +45,7 @@ public class DayStatisticsTab extends EntryListTab<DayStatisticsTab.Entry> {
         adder.add(WALLS_COLUMN = of("Walls", Comparator.comparing(g -> g.stat.walls())));
         adder.add(WALLS_PER_WIN_COLUMN = of("Walls/Win", Comparator.comparing(g -> g.stat.wallsPerWin())));
         adder.add(AVERAGE_TIME_COLUMN = of("Avg. Time", Comparator.comparing(g -> g.stat.averageTime())));
-        adder.add(SHORTEST_TIME_COLUMN = of("Shortest Time", Comparator.comparing(g -> g.stat.fastestTime())));
+        adder.add(SHORTEST_TIME_COLUMN = of("Shortest Win", Comparator.comparing(g -> g.stat.fastestWin())));
 
         HITWTracker.get().getStatsManager().getDailyStats().whenCompleteAsync((results, err) -> {
             if (err != null) {
@@ -54,6 +54,9 @@ public class DayStatisticsTab extends EntryListTab<DayStatisticsTab.Entry> {
             }
 
             results.values().forEach(stat -> addEntry(new Entry(stat)));
+
+            DATE_COLUMN.setDirection(0);
+            setScrollAmount(0);
         });
     }
 
@@ -92,7 +95,7 @@ public class DayStatisticsTab extends EntryListTab<DayStatisticsTab.Entry> {
             draw(context, String.valueOf(stat.walls()), WALLS_COLUMN, y, colour);
             draw(context, String.format("%.1f", stat.wallsPerWin()), WALLS_PER_WIN_COLUMN, y, colour);
             draw(context, toTime(stat.averageTime()), AVERAGE_TIME_COLUMN, y, colour);
-            draw(context, toTime(stat.fastestTime()), SHORTEST_TIME_COLUMN, y, colour);
+            draw(context, toTime(stat.fastestWin()), SHORTEST_TIME_COLUMN, y, colour);
 
         }
     }
