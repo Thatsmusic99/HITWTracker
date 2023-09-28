@@ -121,6 +121,10 @@ public class StatisticManager {
         return getStats(this.deathStatistics, this::formDeathStatistics);
     }
 
+    public @NotNull CompletableFuture<@NotNull HashMap<String, MapStatistic>> getMapStats() {
+        return getStats(this.mapStatistics, this::formMapStatistics);
+    }
+
     public @NotNull CompletableFuture<@NotNull List<TieStatistic>> getTieStats() {
 
         return getStats(this.tieStatistics, this::formTieStatistics);
@@ -171,7 +175,7 @@ public class StatisticManager {
             if (stat.placement() <= 3) topThrees++;
             walls += stat.walls();
             totalTime += stat.seconds();
-            shortestTime = (short) Math.min(shortestTime, stat.seconds());
+            shortestTime = stat.placement() == 1 ? (short) Math.min(shortestTime, stat.seconds()) : shortestTime;
         }
 
         final float avgPlace = placements / (float) games;
@@ -209,6 +213,30 @@ public class StatisticManager {
         return deathStats;
     }
 
+    private @NotNull HashMap<String, MapStatistic> formMapStatistics() {
+
+        // Get all statistics
+        for (long time : this.dailyStats.keySet()) {
+            for (Statistic statistic : this.dailyStats.get(time)) {
+
+                // Overall stats
+                if (this.mapStatistics.containsKey("OVERALL")) {
+                    this.mapStatistics.get("OVERALL").update(statistic);
+                } else {
+                    this.mapStatistics.put("OVERALL", new MapStatistic("Overall"));
+                }
+
+                if (this.mapStatistics.containsKey(statistic.map())) {
+                    this.mapStatistics.get(statistic.map()).update(statistic);
+                } else {
+                    this.mapStatistics.put(statistic.map(), new MapStatistic(statistic.map()));
+                }
+            }
+        }
+
+        return this.mapStatistics;
+    }
+
     private @NotNull List<TieStatistic> formTieStatistics() {
 
         // Go through each statistic for each day
@@ -236,6 +264,9 @@ public class StatisticManager {
 
     public void addStatToCache(final @NotNull Statistic statistic) {
 
+        // If stats haven't already been loaded, don't for now
+        if (!loaded) return;
+
         // Get the date to save to
         long time = getDayAtMidnight(statistic.date());
 
@@ -246,6 +277,85 @@ public class StatisticManager {
 
         existingStats.add(statistic);
         this.dailyStats.put(time, existingStats);
+
+        updateDayStatistic(statistic);
+        updateDeathStatistic(statistic);
+        updateMapStatistic(statistic);
+        updateTieStatistic(statistic);
+    }
+
+    private void updateDayStatistic(final @NotNull Statistic statistic) {
+
+        // Get the date to save to
+        long time = getDayAtMidnight(statistic.date());
+
+        // Update day statistic
+        DayStatistic dayStatistic = this.dayStatistics.get(time);
+        if (dayStatistic != null) {
+
+            final Date date = dayStatistic.date;
+            final int games = dayStatistic.games + 1;
+            final float avgPlacement = (dayStatistic.games * dayStatistic.avgPlacement + statistic.placement()) / dayStatistic.games;
+            final short tieCount = (short) (statistic.ties().length > 0 ? dayStatistic.tieCount + 1 : dayStatistic.tieCount);
+            final float tieRate = tieCount / (float) games;
+            final short winCount = (short) (statistic.placement() == 1 ? dayStatistic.winCount + 1 : dayStatistic.winCount);
+            final float winRate = winCount / (float) games;
+            final short topThreeCount = (short) (statistic.placement() < 4 ? dayStatistic.topThreeCount + 1 : dayStatistic.topThreeCount);
+            final float topThreeRate = topThreeCount / (float) games;
+            final int walls = dayStatistic.walls + statistic.walls();
+            final float wallsPerWin = walls / (float) winCount;
+            final short averageTime = (short) ((dayStatistic.averageTime * dayStatistic.games + statistic.seconds()) / dayStatistic.games);
+            final short shortestTime = (short) (statistic.placement() == 1 ? Math.min(statistic.seconds(), dayStatistic.fastestWin) : dayStatistic.fastestWin);
+
+            this.dayStatistics.put(time, new DayStatistic(date, games, avgPlacement, tieCount, tieRate, winCount,
+                    winRate, topThreeCount, topThreeRate, walls, wallsPerWin, averageTime, shortestTime));
+        }
+    }
+
+    private void updateDeathStatistic(final @NotNull Statistic statistic) {
+
+        // If there's no death reason, stop there
+        if (statistic.deathCause().isEmpty()) return;
+
+        // Go through each death statistic and update stats
+        for (DeathStatistic deathStatistic : this.deathStatistics) {
+            deathStatistic.games++;
+            if (deathStatistic.reason.equals(statistic.deathCause())) {
+                deathStatistic.count++;
+            }
+        }
+    }
+
+    private void updateMapStatistic(final @NotNull Statistic statistic) {
+        if (this.mapStatistics.containsKey(statistic.map())) {
+            this.mapStatistics.get(statistic.map()).update(statistic);
+        }
+
+        if (this.mapStatistics.containsKey("OVERALL")) {
+            this.mapStatistics.get("OVERALL").update(statistic);
+        }
+    }
+
+    private void updateTieStatistic(final @NotNull Statistic statistic) {
+
+        // If there's no ties, stop there
+        if (statistic.ties().length == 0) return;
+
+        // Go through each tie to update
+        List<String> tiedPlayersAdded = new ArrayList<>(Arrays.asList(statistic.ties()));
+        for (TieStatistic tieStatistic : this.tieStatistics) {
+            for (String player : statistic.ties()) {
+                if (tieStatistic.player.equals(player)) {
+                    tieStatistic.count++;
+                    tiedPlayersAdded.remove(player);
+                }
+            }
+        }
+
+        // For each player not added, add them
+        for (String player : tiedPlayersAdded) {
+            this.tieStatistics.add(new TieStatistic(player, 1));
+        }
     }
 
     private long getDayAtMidnight(final @NotNull Date date) {
@@ -272,28 +382,194 @@ public class StatisticManager {
                                int walls,
                                float wallsPerWin,
                                short averageTime,
-                               short fastestTime) {
+                               short fastestWin) {
     }
 
-    public record DeathStatistic(@NotNull String reason, int count, int games) {
+    public static class DeathStatistic {
 
+        private final @NotNull String reason;
+        private int count;
+        private int games;
+
+        public DeathStatistic(@NotNull String reason, int count, int games) {
+            this.reason = reason;
+            this.count = count;
+            this.games = games;
+        }
+
+        public int getGames() {
+            return games;
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        public @NotNull String getReason() {
+            return reason;
+        }
     }
 
-    public record MapStatistic(@NotNull String map,
-                               float averagePlacement,
-                               String topDeathReason,
-                               int ties,
-                               int largestTie,
-                               @NotNull String mostTiedWith,
-                               int wins,
-                               int topThrees,
-                               int walls,
-                               short averageTime,
-                               short fastestTime) {
+    public static class MapStatistic {
 
+        private final @NotNull String map;
+        private int games;
+        private float avgPlacement;
+        private final @NotNull List<String> deaths;
+        private @Nullable String topDeathCause;
+        private int ties;
+        private int largestTie;
+        private final @NotNull List<String> tiedWith;
+        private @Nullable String mostTiedWith;
+        private int wins;
+        private int topThrees;
+        private int walls;
+        private short averageTime;
+        private short fastestTime;
+
+        public MapStatistic(final @NotNull String map) {
+            this(map, 0, 0, new ArrayList<>(), 0, 0, new ArrayList<>(), 0,
+                    0, 0, (short) 0, (short) 240);
+        }
+
+        public MapStatistic(final @NotNull String map,
+                            int games,
+                            float avgPlacement,
+                            @NotNull List<String> deaths,
+                            int ties,
+                            int largestTie,
+                            @NotNull List<String> tiedWith,
+                            int wins,
+                            int topThrees,
+                            int walls,
+                            short averageTime,
+                            short fastestTime) {
+            this.map = capitalise(map);
+            this.games = games;
+            this.avgPlacement = avgPlacement;
+            this.deaths = deaths;
+            this.topDeathCause = getTopResult(deaths);
+            this.ties = ties;
+            this.largestTie = largestTie;
+            this.tiedWith = tiedWith;
+            this.mostTiedWith = getTopResult(tiedWith);
+            this.wins = wins;
+            this.topThrees = topThrees;
+            this.walls = walls;
+            this.averageTime = averageTime;
+            this.fastestTime = fastestTime;
+        }
+
+        void update(Statistic statistic) {
+
+            this.games++;
+            this.avgPlacement = ((this.avgPlacement * (this.games - 1)) + statistic.placement()) / (float) this.games;
+            this.deaths.add(statistic.deathCause());
+            this.topDeathCause = getTopResult(this.deaths);
+            if (statistic.ties().length > 0) this.ties++;
+            this.largestTie = Math.max(this.largestTie, statistic.ties().length);
+            this.tiedWith.addAll(Arrays.asList(statistic.ties()));
+            this.mostTiedWith = getTopResult(this.tiedWith);
+            if (statistic.placement() == 1) this.wins++;
+            if (statistic.placement() < 4) this.topThrees++;
+            this.walls += statistic.walls();
+            this.averageTime = (short) (((this.averageTime * (this.games - 1)) + statistic.seconds()) / this.games);
+            if (statistic.placement() == 1) this.fastestTime = (short) Math.min(this.fastestTime, statistic.seconds());
+        }
+
+        private @Nullable String getTopResult(@NotNull List<String> list) {
+
+            HashMap<String, Integer> counts = new HashMap<>();
+            int maxValue = 0;
+            String maxResult = null;
+
+            for (String str : list) {
+                int count = 1;
+                if (counts.containsKey(str)) {
+                    count = counts.get(str) + 1;
+                } else {
+                    counts.put(str, count);
+                }
+
+                if (maxValue < count) {
+                    maxValue = count;
+                    maxResult = str;
+                }
+            }
+
+            return maxResult;
+        }
+
+        private static String capitalise(String name) {
+            if (name.isEmpty()) return name;
+            return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
+        }
+
+        public @NotNull String getMap() {
+            return map;
+        }
+
+        public int getGames() {
+            return games;
+        }
+
+        public float getAvgPlacement() {
+            return avgPlacement;
+        }
+
+        public @Nullable String getTopDeathCause() {
+            return topDeathCause;
+        }
+
+        public int getTies() {
+            return ties;
+        }
+
+        public int getLargestTie() {
+            return largestTie;
+        }
+
+        public @Nullable String getMostTiedWith() {
+            return mostTiedWith;
+        }
+
+        public int getWins() {
+            return wins;
+        }
+
+        public int getTopThrees() {
+            return topThrees;
+        }
+
+        public int getWalls() {
+            return walls;
+        }
+
+        public short getAverageTime() {
+            return averageTime;
+        }
+
+        public short getFastestTime() {
+            return fastestTime;
+        }
     }
 
-    public record TieStatistic(@NotNull String player, int count) {
+    public static class TieStatistic {
 
+        private final @NotNull String player;
+        private int count;
+
+        public TieStatistic(@NotNull String player, int count) {
+            this.player = player;
+            this.count = count;
+        }
+
+        public @NotNull String getPlayer() {
+            return player;
+        }
+
+        public int getCount() {
+            return count;
+        }
     }
 }

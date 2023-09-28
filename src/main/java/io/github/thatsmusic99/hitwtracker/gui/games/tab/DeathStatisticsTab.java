@@ -25,12 +25,15 @@ public class DeathStatisticsTab extends EntryListTab<DeathStatisticsTab.Entry> {
         super(client, parent, top, bottom, 10);
 
         GridWidget.Adder adder = this.grid.setColumnSpacing(40).createAdder(8);
-        adder.add(DEATH_CAUSE_COLUMN = of("Death", Comparator.comparing(g -> g.stat.reason())));
-        adder.add(COUNT_COLUMN = of("Count", Comparator.comparing(g -> g.stat.count())));
-        adder.add(RATE_COLUMN = of("Rate", Comparator.comparing(g -> g.stat.count() / (float) g.stat.games())));
+        adder.add(DEATH_CAUSE_COLUMN = of("Death", Comparator.comparing(g -> g.stat.getReason())));
+        adder.add(COUNT_COLUMN = of("Count", Comparator.comparing(g -> g.stat.getCount())));
+        adder.add(RATE_COLUMN = of("Rate", Comparator.comparing(g -> g.stat.getCount() / (float) g.stat.getGames())));
 
-        HITWTracker.get().getStatsManager().getDeathStats().whenComplete((stats, err) ->
-                stats.forEach(stat -> addEntry(new Entry(stat))));
+        HITWTracker.get().getStatsManager().getDeathStats().whenComplete((stats, err) -> {
+            stats.forEach(stat -> addEntry(new Entry(stat)));
+            RATE_COLUMN.setDirection(0);
+            setScrollAmount(0);
+        });
     }
 
     @Override
@@ -56,9 +59,9 @@ public class DeathStatisticsTab extends EntryListTab<DeathStatisticsTab.Entry> {
 
             final int colour = index % 2 == 1 ? 0xffffff : 11184810;
 
-            draw(context, stat.reason(), DEATH_CAUSE_COLUMN, y, colour);
-            draw(context, String.valueOf(stat.count()), COUNT_COLUMN, y, colour);
-            draw(context, String.format("%.2f", stat.count() / (float) stat.games() * 100) + "%", RATE_COLUMN, y, colour);
+            draw(context, stat.getReason(), DEATH_CAUSE_COLUMN, y, colour);
+            draw(context, String.valueOf(stat.getCount()), COUNT_COLUMN, y, colour);
+            draw(context, String.format("%.2f", stat.getCount() / (float) stat.getGames() * 100) + "%", RATE_COLUMN, y, colour);
         }
     }
 }

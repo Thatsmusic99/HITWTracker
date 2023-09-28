@@ -25,11 +25,14 @@ public class TieStatisticsTab extends EntryListTab<TieStatisticsTab.Entry> {
         super(client, parent, top, bottom, 10);
 
         GridWidget.Adder adder = this.grid.setColumnSpacing(80).createAdder(8);
-        adder.add(PLAYER_COLUMN = of("Player", Comparator.comparing(g -> g.stat.player())));
-        adder.add(TIES_COLUMN = of("Ties", Comparator.comparing(g -> g.stat.count())));
+        adder.add(PLAYER_COLUMN = of("Player", Comparator.comparing(g -> g.stat.getPlayer())));
+        adder.add(TIES_COLUMN = of("Ties", Comparator.comparing(g -> g.stat.getCount())));
 
-        HITWTracker.get().getStatsManager().getTieStats().whenComplete((stats, err) ->
-                stats.forEach(stat -> addEntry(new Entry(stat))));
+        HITWTracker.get().getStatsManager().getTieStats().whenComplete((stats, err) -> {
+            stats.forEach(stat -> addEntry(new Entry(stat)));
+            TIES_COLUMN.setDirection(0);
+            setScrollAmount(0);
+        });
     }
 
     @Override
@@ -55,8 +58,8 @@ public class TieStatisticsTab extends EntryListTab<TieStatisticsTab.Entry> {
 
             final int colour = index % 2 == 1 ? 0xffffff : 11184810;
 
-            draw(context, stat.player(), PLAYER_COLUMN, y, colour);
-            draw(context, String.valueOf(stat.count()), TIES_COLUMN, y, colour);
+            draw(context, stat.getPlayer(), PLAYER_COLUMN, y, colour);
+            draw(context, String.valueOf(stat.getCount()), TIES_COLUMN, y, colour);
         }
     }
 }
