@@ -1,0 +1,30 @@
+name: Publish New Version (Automatic Versioning)
+
+on: 
+  workflow_dispatch:
+    branches: ["master"]
+
+jobs:
+  publish:
+    name: Publish
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@main
+        with:
+          fetch-depth: 0
+          
+      - name: Semver release
+        uses: oknozor/cocogitto-action@v3
+        with:
+          release: true
+          git-user: 'Thatsmusic99'
+          git-user-email: '25277367+Thatsmusic99@users.noreply.github.com'
+          
+      - name: Upload github release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: GITHUB_CHANGELOG.md
+          tag_name: ${{ steps.publish.outputs.version }}
+          with:
+            files: build/libs/HITWTracker-*.jar
+    
