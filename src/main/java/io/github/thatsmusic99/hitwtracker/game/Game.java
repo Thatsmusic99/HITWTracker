@@ -48,6 +48,7 @@ public class Game {
     public void setPlacement(byte placement) {
         this.placement = placement;
         if (placement == 1) setDeathReason("");
+        if (placement != 1) setTies(new String[0]);
         if (canSave()) save();
     }
 
