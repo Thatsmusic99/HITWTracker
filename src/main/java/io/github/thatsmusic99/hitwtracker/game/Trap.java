@@ -1,7 +1,9 @@
 package io.github.thatsmusic99.hitwtracker.game;
 
+import io.github.thatsmusic99.hitwtracker.util.interfaces.LessRecentDamageGetter;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.*;
 import net.minecraft.entity.player.PlayerEntity;
@@ -51,9 +53,11 @@ public enum Trap {
     }
 
     private static boolean checkDamageSource(@NotNull ClientPlayerEntity player, @NotNull Class<? extends Entity> clazz) {
-        return player.getRecentDamageSource() != null
-                && player.getRecentDamageSource().getSource() != null
-                && player.getRecentDamageSource().getSource().getClass().isAssignableFrom(clazz);
+
+        DamageSource source = ((LessRecentDamageGetter) player).getLessRecentDamageSource();
+        return source != null
+                && source.getSource() != null
+                && source.getSource().getClass().isAssignableFrom(clazz);
     }
 
     public static Trap getTrap(@NotNull ClientPlayerEntity player) {
