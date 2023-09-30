@@ -1,6 +1,8 @@
 package io.github.thatsmusic99.hitwtracker.gui.games.tab;
 
+import io.github.thatsmusic99.hitwtracker.HITWTracker;
 import io.github.thatsmusic99.hitwtracker.gui.tab.EntryListTab;
+import io.github.thatsmusic99.hitwtracker.manager.StatisticManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -22,6 +24,16 @@ public class MiscStatisticsTab extends EntryListTab<MiscStatisticsTab.Entry> {
         GridWidget.Adder adder = this.grid.setColumnSpacing(100).createAdder(2);
         adder.add(STATISTIC_COLUMN = of("Statistic", (g1, g2) -> 0));
         adder.add(VALUE_COLUMN = of("Value", (g1, g2) -> 0));
+
+        HITWTracker.get().getStatsManager().getMiscStats().whenComplete((results, err) -> {
+
+            if (err != null) {
+                err.printStackTrace();
+                return;
+            }
+
+            results.forEach(stat -> addEntry(new Entry(stat)));
+        });
     }
 
     @Override
@@ -31,14 +43,24 @@ public class MiscStatisticsTab extends EntryListTab<MiscStatisticsTab.Entry> {
 
     public class Entry extends EntryListTab<Entry>.Entry {
 
+        private final @NotNull StatisticManager.MiscStatistic stat;
+
+        public Entry(final @NotNull StatisticManager.MiscStatistic stat) {
+            this.stat = stat;
+        }
+
         @Override
         public Text getNarration() {
-            return null;
+            return Text.of("");
         }
 
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
 
+            final int colour = index % 2 == 1 ? 0xffffff : 11184810;
+
+            draw(context, stat.descriptor(), STATISTIC_COLUMN, y, colour);
+            draw(context, stat.value(), VALUE_COLUMN, y, colour);
         }
     }
 }
