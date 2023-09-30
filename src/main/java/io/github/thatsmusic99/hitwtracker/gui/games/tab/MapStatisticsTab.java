@@ -78,7 +78,7 @@ public class MapStatisticsTab extends EntryListTab<MapStatisticsTab.Entry> {
 
         @Override
         public Text getNarration() {
-            return null;
+            return Text.of("");
         }
 
         @Override

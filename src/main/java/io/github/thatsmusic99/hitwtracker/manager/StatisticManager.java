@@ -22,6 +22,7 @@ public class StatisticManager {
     private final @NotNull HashMap<Long, DayStatistic> dayStatistics;
     private final @NotNull List<DeathStatistic> deathStatistics;
     private final @NotNull HashMap<String, MapStatistic> mapStatistics;
+    private final @NotNull List<MiscStatistic> miscStatistics;
     private final @NotNull List<TieStatistic> tieStatistics;
     private final @NotNull List<Long> times;
     private transient @Nullable CompletableFuture<Void> loading;
@@ -32,6 +33,7 @@ public class StatisticManager {
         this.dayStatistics = new HashMap<>();
         this.deathStatistics = new ArrayList<>();
         this.mapStatistics = new HashMap<>();
+        this.miscStatistics = new ArrayList<>();
         this.tieStatistics = new ArrayList<>();
         this.times = new ArrayList<>();
         this.loaded = false;
@@ -125,6 +127,10 @@ public class StatisticManager {
         return getStats(this.mapStatistics, this::formMapStatistics);
     }
 
+    public @NotNull CompletableFuture<@NotNull List<MiscStatistic>> getMiscStats() {
+        return getStats(this.miscStatistics, this::formMiscStatistics);
+    }
+
     public @NotNull CompletableFuture<@NotNull List<TieStatistic>> getTieStats() {
 
         return getStats(this.tieStatistics, this::formTieStatistics);
@@ -164,7 +170,7 @@ public class StatisticManager {
         short wins = 0;
         short topThrees = 0;
         int walls = 0;
-        int totalTime = 0;
+        short totalTime = 0;
         short shortestTime = 240;
 
         // Go through each statistic...
@@ -179,9 +185,8 @@ public class StatisticManager {
         }
 
         final float avgPlace = placements / (float) games;
-        final short avgTime = (short) (totalTime / games);
 
-        return new DayStatistic(date, games, avgPlace, ties, wins, topThrees, walls, avgTime, shortestTime);
+        return new DayStatistic(date, games, avgPlace, ties, wins, topThrees, walls, totalTime, shortestTime);
 
     }
 
@@ -231,6 +236,87 @@ public class StatisticManager {
         }
 
         return this.mapStatistics;
+    }
+
+    private @NotNull List<MiscStatistic> formMiscStatistics() {
+
+        // Highest streak stats (ties, wins, top 3's)
+        int[] streaks = new int[3];
+
+        // Daily records (ties, wins, top 3's)
+        int[] dailyRecords = new int[3];
+
+        // Average stats
+        int totalGames = 0;
+        int totalWins = 0;
+        int totalTime = 0;
+
+        for (long time : this.dailyStats.keySet()) {
+
+            int tieCount = 0;
+            int winCount = 0;
+            int topThreeCount = 0;
+
+            int[] dayStreaks = new int[3];
+
+            // Find each streak
+            for (Statistic statistic : this.dailyStats.get(time)) {
+
+                if (statistic.ties().length > 0) {
+                    tieCount++;
+                    dayStreaks[0]++;
+                } else {
+                    dayStreaks[0] = 0;
+                }
+
+                if (statistic.placement() == 1) {
+                    winCount++;
+                    dayStreaks[1]++;
+                } else {
+                    dayStreaks[1] = 0;
+                }
+
+                if (statistic.placement() < 4) {
+                    topThreeCount++;
+                    dayStreaks[2]++;
+                } else {
+                    dayStreaks[2] = 0;
+                }
+
+                streaks[0] = Math.max(dayStreaks[0], streaks[0]);
+                streaks[1] = Math.max(dayStreaks[1], streaks[1]);
+                streaks[2] = Math.max(dayStreaks[2], streaks[2]);
+
+                totalTime += statistic.seconds();
+                totalGames++;
+            }
+
+            dailyRecords[0] = Math.max(dailyRecords[0], tieCount);
+            dailyRecords[1] = Math.max(dailyRecords[1], winCount);
+            dailyRecords[2] = Math.max(dailyRecords[2], topThreeCount);
+
+            totalWins += winCount;
+        }
+
+        //
+        final List<MiscStatistic> stats = new ArrayList<>();
+        stats.add(new MiscStatistic("Highest Tie Streak", String.valueOf(streaks[0])));
+        stats.add(new MiscStatistic("Highest Win Streak", String.valueOf(streaks[1])));
+        stats.add(new MiscStatistic("Highest Top Three Streak", String.valueOf(streaks[2])));
+
+        stats.add(new MiscStatistic("Daily Tie Record", String.valueOf(dailyRecords[0])));
+        stats.add(new MiscStatistic("Daily Win Record", String.valueOf(dailyRecords[1])));
+        stats.add(new MiscStatistic("Daily Top Three Record", String.valueOf(dailyRecords[2])));
+
+        stats.add(new MiscStatistic("Average Games per Day", String.valueOf(totalGames / this.dailyStats.size())));
+        stats.add(new MiscStatistic("Average Wins per Day", String.valueOf(totalWins / this.dailyStats.size())));
+        stats.add(new MiscStatistic("Average Time per Day", toTimeUnits(totalTime / this.dailyStats.size())));
+
+        stats.add(new MiscStatistic("Total Time In-Game", toTimeUnits(totalTime)));
+
+        this.miscStatistics.addAll(stats);
+
+        return stats;
     }
 
     private @NotNull List<TieStatistic> formTieStatistics() {
@@ -296,11 +382,11 @@ public class StatisticManager {
             final short winCount = (short) (statistic.placement() == 1 ? dayStatistic.winCount + 1 : dayStatistic.winCount);
             final short topThreeCount = (short) (statistic.placement() < 4 ? dayStatistic.topThreeCount + 1 : dayStatistic.topThreeCount);
             final int walls = dayStatistic.walls + statistic.walls();
-            final short averageTime = (short) ((dayStatistic.averageTime * dayStatistic.games + statistic.seconds()) / dayStatistic.games);
+            final short totalTime = (short) (dayStatistic.totalTime + statistic.seconds());
             final short shortestTime = (short) (statistic.placement() == 1 ? Math.min(statistic.seconds(), dayStatistic.fastestWin) : dayStatistic.fastestWin);
 
             this.dayStatistics.put(time, new DayStatistic(date, games, avgPlacement, tieCount, winCount, topThreeCount,
-                    walls, averageTime, shortestTime));
+                    walls, totalTime, shortestTime));
         }
     }
 
@@ -362,6 +448,22 @@ public class StatisticManager {
         return calendar.getTimeInMillis();
     }
 
+    private String toTimeUnits(int seconds) {
+        if (seconds < 60) {
+            return seconds + "s";
+        }
+        if (seconds < 3600) {
+            int remainingSecs = (seconds % 60);
+            return (seconds / 60) + "m" + (remainingSecs == 0 ? "" : " " + remainingSecs + "s");
+        }
+        int remainingSecs = (seconds % 60);
+        int remainingMins = (seconds % 3600) / 60;
+        int remainingHours = seconds / 3600;
+        return remainingHours + "hr"
+                + (remainingMins == 0 ? "" : " " + remainingMins + "m")
+                + (remainingSecs == 0 ? "" : " " + remainingSecs + "s");
+    }
+
     public record DayStatistic(@NotNull Date date,
                                int games,
                                float avgPlacement,
@@ -369,7 +471,7 @@ public class StatisticManager {
                                short winCount,
                                short topThreeCount,
                                int walls,
-                               short averageTime,
+                               short totalTime,
                                short fastestWin) {
 
         public float tieRate() {
@@ -386,6 +488,10 @@ public class StatisticManager {
 
         public float wallsPerWin() {
             return walls / (float) winCount;
+        }
+
+        public short averageTime() {
+            return (short) (totalTime / games);
         }
     }
 
@@ -557,6 +663,8 @@ public class StatisticManager {
             return fastestTime;
         }
     }
+
+    public record MiscStatistic(@NotNull String descriptor, @NotNull String value) {}
 
     public static class TieStatistic {
 
