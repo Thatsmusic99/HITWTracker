@@ -179,13 +179,9 @@ public class StatisticManager {
         }
 
         final float avgPlace = placements / (float) games;
-        final float tieRate = ties / (float) games;
-        final float winRate = wins / (float) games;
-        final float topThreeRate = topThrees / (float) games;
-        final float wallsPerWin = walls / (float) wins;
         final short avgTime = (short) (totalTime / games);
 
-        return new DayStatistic(date, games, avgPlace, ties, tieRate, wins, winRate, topThrees, topThreeRate, walls, wallsPerWin, avgTime, shortestTime);
+        return new DayStatistic(date, games, avgPlace, ties, wins, topThrees, walls, avgTime, shortestTime);
 
     }
 
@@ -297,18 +293,14 @@ public class StatisticManager {
             final int games = dayStatistic.games + 1;
             final float avgPlacement = (dayStatistic.games * dayStatistic.avgPlacement + statistic.placement()) / dayStatistic.games;
             final short tieCount = (short) (statistic.ties().length > 0 ? dayStatistic.tieCount + 1 : dayStatistic.tieCount);
-            final float tieRate = tieCount / (float) games;
             final short winCount = (short) (statistic.placement() == 1 ? dayStatistic.winCount + 1 : dayStatistic.winCount);
-            final float winRate = winCount / (float) games;
             final short topThreeCount = (short) (statistic.placement() < 4 ? dayStatistic.topThreeCount + 1 : dayStatistic.topThreeCount);
-            final float topThreeRate = topThreeCount / (float) games;
             final int walls = dayStatistic.walls + statistic.walls();
-            final float wallsPerWin = walls / (float) winCount;
             final short averageTime = (short) ((dayStatistic.averageTime * dayStatistic.games + statistic.seconds()) / dayStatistic.games);
             final short shortestTime = (short) (statistic.placement() == 1 ? Math.min(statistic.seconds(), dayStatistic.fastestWin) : dayStatistic.fastestWin);
 
-            this.dayStatistics.put(time, new DayStatistic(date, games, avgPlacement, tieCount, tieRate, winCount,
-                    winRate, topThreeCount, topThreeRate, walls, wallsPerWin, averageTime, shortestTime));
+            this.dayStatistics.put(time, new DayStatistic(date, games, avgPlacement, tieCount, winCount, topThreeCount,
+                    walls, averageTime, shortestTime));
         }
     }
 
@@ -374,15 +366,27 @@ public class StatisticManager {
                                int games,
                                float avgPlacement,
                                short tieCount,
-                               float tieRate,
                                short winCount,
-                               float winRate,
                                short topThreeCount,
-                               float topThreeRate,
                                int walls,
-                               float wallsPerWin,
                                short averageTime,
                                short fastestWin) {
+
+        public float tieRate() {
+            return tieCount / (float) games;
+        }
+
+        public float winRate() {
+            return winCount / (float) games;
+        }
+
+        public float topThreeRate() {
+            return topThreeCount / (float) games;
+        }
+
+        public float wallsPerWin() {
+            return walls / (float) winCount;
+        }
     }
 
     public static class DeathStatistic {
