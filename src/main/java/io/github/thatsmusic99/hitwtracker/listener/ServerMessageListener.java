@@ -13,7 +13,7 @@ public class ServerMessageListener {
 
     private static final Logger logger = Logger.getLogger(ServerMessageListener.class.getName());
     private static final Pattern GAME_STARTED = Pattern.compile("^\\[.] Game Started!");
-    private static final Pattern PLAYER_NAME = Pattern.compile("[^a-zA-Z_0-9]*(\\w+)");
+    private static final Pattern PLAYER_NAME = Pattern.compile("[^a-zA-Z_0-9]*(\\w+)[^a-zA-Z_0-9]*");
     private static final Pattern GAME_LOST = Pattern.compile("^\\[.] .+(\\w+), you were eliminated in (\\d+)\\w+ \\(Score: (\\d+).\\)");
     private static final Pattern GAME_WON = Pattern.compile("^\\[.] .+(\\w+), you survived the walls! \\(Score: (\\d+).\\)");
     private static final Pattern GAME_WINNERS = Pattern.compile("^\\[.] Game Winner\\(s\\): (.+)");
