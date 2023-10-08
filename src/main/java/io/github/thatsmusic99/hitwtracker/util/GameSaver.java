@@ -22,19 +22,26 @@ public class GameSaver {
 
     public static void saveGame(final @NotNull Statistic statistic) throws IOException {
 
-        // Create the parent folder
-        final File parentFolder = new File("games");
-        if (!parentFolder.exists()) {
-            if (!parentFolder.mkdir()) {
-                throw new IOException("Failed to create parent folder " + parentFolder.getName());
+        // Create the parent folders
+        final File gamesFolder = new File("games");
+        if (!gamesFolder.exists()) {
+            if (!gamesFolder.mkdir()) {
+                throw new IOException("Failed to create parent folder " + gamesFolder.getName());
+            }
+        }
+
+        final File hitwFolder = new File(gamesFolder, "hitw");
+        if (!hitwFolder.exists()) {
+            if (!hitwFolder.mkdir()) {
+                throw new IOException("Failed to create parent folder " + hitwFolder.getName());
             }
         }
 
         // Get the file to save to
         final Date date = statistic.date();
         final String dateFormat = new SimpleDateFormat("dd-MM-yyyy").format(date);
-        final File saveFile = new File(parentFolder, dateFormat + ".json");
-        final File saveZipFile = new File(parentFolder, dateFormat + ".zip");
+        final File saveFile = new File(hitwFolder, dateFormat + ".json");
+        final File saveZipFile = new File(hitwFolder, dateFormat + ".zip");
 
         final String content;
 
