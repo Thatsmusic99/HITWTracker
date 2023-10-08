@@ -30,7 +30,7 @@ public abstract class EntryListTab<E extends AlwaysSelectedEntryListWidget.Entry
         this.parent = parent;
 
         setRenderHeader(false, 0);
-        setRenderHorizontalShadows(false);
+        // setRenderHorizontalShadows(false);
         setRenderBackground(false);
     }
 
