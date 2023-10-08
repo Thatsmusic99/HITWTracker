@@ -2,6 +2,7 @@ package io.github.thatsmusic99.hitwtracker.mixin;
 
 import io.github.thatsmusic99.hitwtracker.game.GameTracker;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.network.packet.s2c.play.ScoreboardObjectiveUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.TeamS2CPacket;
 import org.slf4j.Logger;
@@ -48,5 +49,9 @@ public abstract class ClientPlayNetworkHandlerMixin {
         return packet;
     }
 
+    @ModifyVariable(at = @At("TAIL"), method = "onExplosion", argsOnly = true)
+    private ExplosionS2CPacket onExplosion(ExplosionS2CPacket packet) {
+        return packet;
+    }
 
 }
