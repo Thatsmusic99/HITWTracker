@@ -48,9 +48,12 @@ public class StatisticManager {
             final File gamesFolder = new File("games");
             if (!gamesFolder.exists()) return;
 
+            final File hitwFolder = new File("hitw");
+            if (!hitwFolder.exists()) return;
+
             // Go through each file
-            final File[] files = gamesFolder.listFiles();
-            if (files == null) return;
+            final File[] files = hitwFolder.listFiles();
+            if (files == null || files.length == 0) return;
             for (int i = files.length - 1; i >= 0; i--) {
 
                 // Get the file itself
