@@ -8,6 +8,8 @@ import io.github.thatsmusic99.hitwtracker.serializer.StatisticSerializer;
 import io.github.thatsmusic99.hitwtracker.util.GameSaver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +20,7 @@ import java.util.function.Supplier;
 
 public class StatisticManager {
 
+    private static final @NotNull Logger LOGGER = LoggerFactory.getLogger(StatisticManager.class);
     private final @NotNull HashMap<Long, List<Statistic>> dailyStats;
     private final @NotNull HashMap<Long, DayStatistic> dayStatistics;
     private final @NotNull List<DeathStatistic> deathStatistics;
@@ -41,19 +44,32 @@ public class StatisticManager {
 
     private @NotNull CompletableFuture<Void> load() {
         if (loading != null) return loading;
+        LOGGER.info("Loading statistic data...");
 
         return loading = CompletableFuture.runAsync(() -> {
 
             // Go through each file in the games folder
             final File gamesFolder = new File("games");
-            if (!gamesFolder.exists()) return;
+            if (!gamesFolder.exists()) {
+                LOGGER.info("Games folder does not exist.");
+                loading = null;
+                return;
+            }
 
-            final File hitwFolder = new File("hitw");
-            if (!hitwFolder.exists()) return;
+            final File hitwFolder = new File(gamesFolder, "hitw");
+            if (!hitwFolder.exists()) {
+                LOGGER.info("HITW folder does not exist.");
+                loading = null;
+                return;
+            }
 
             // Go through each file
             final File[] files = hitwFolder.listFiles();
-            if (files == null || files.length == 0) return;
+            if (files == null || files.length == 0) {
+                LOGGER.info("Folder is empty.");
+                loading = null;
+                return;
+            }
             for (int i = files.length - 1; i >= 0; i--) {
 
                 // Get the file itself
@@ -92,6 +108,7 @@ public class StatisticManager {
 
             loading = null;
             loaded = true;
+            LOGGER.info("Loaded " + this.dailyStats.size() + " stats.");
         }, HITWTracker.executorService);
     }
 
@@ -311,9 +328,9 @@ public class StatisticManager {
         stats.add(new MiscStatistic("Daily Win Record", String.valueOf(dailyRecords[1])));
         stats.add(new MiscStatistic("Daily Top Three Record", String.valueOf(dailyRecords[2])));
 
-        stats.add(new MiscStatistic("Average Games per Day", String.valueOf(totalGames / this.dailyStats.size())));
-        stats.add(new MiscStatistic("Average Wins per Day", String.valueOf(totalWins / this.dailyStats.size())));
-        stats.add(new MiscStatistic("Average Time per Day", toTimeUnits(totalTime / this.dailyStats.size())));
+        stats.add(new MiscStatistic("Average Games per Day", String.valueOf(totalGames / Math.max(1, this.dailyStats.size()))));
+        stats.add(new MiscStatistic("Average Wins per Day", String.valueOf(totalWins / Math.max(1, this.dailyStats.size()))));
+        stats.add(new MiscStatistic("Average Time per Day", toTimeUnits(totalTime / Math.max(1, this.dailyStats.size()))));
 
         stats.add(new MiscStatistic("Total Time In-Game", toTimeUnits(totalTime)));
 
@@ -350,7 +367,10 @@ public class StatisticManager {
     public void addStatToCache(final @NotNull Statistic statistic) {
 
         // If stats haven't already been loaded, don't for now
-        if (!loaded) return;
+        if (!loaded) {
+            LOGGER.info("Statistics are not loaded, not adding the stat to cache.");
+            return;
+        }
 
         // Get the date to save to
         long time = getDayAtMidnight(statistic.date());
