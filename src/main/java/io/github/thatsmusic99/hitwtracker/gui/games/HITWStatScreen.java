@@ -102,6 +102,11 @@ public class HITWStatScreen extends Screen {
     }
 
     @Override
+    public void renderInGameBackground(DrawContext context) {
+
+    }
+
+    @Override
     public <T extends Element & Drawable & Selectable> T addDrawableChild(T drawableElement) {
         return super.addDrawableChild(drawableElement);
     }
