@@ -36,6 +36,8 @@ public abstract class ClientPlayNetworkHandlerMixin {
         if (packet.getMode() != 2) return packet;
         if (packet.getDisplayName().getString().isEmpty()) return packet;
 
+        LOGGER.debug("Detected title: " + packet.getDisplayName().getString());
+
         if (HITW_TITLE.matcher(packet.getDisplayName().getString()).matches()) {
             GameTracker.confirm(false);
         } else if (HITW_PLOBBY_TITLE.matcher(packet.getDisplayName().getString()).matches()) {
@@ -122,5 +124,4 @@ public abstract class ClientPlayNetworkHandlerMixin {
 
         return packet;
     }
-
 }
