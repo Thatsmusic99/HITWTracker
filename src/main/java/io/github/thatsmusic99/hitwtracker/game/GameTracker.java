@@ -26,6 +26,7 @@ public class GameTracker {
     private static @Nullable String map;
     private static @Nullable String lastTrap;
     private static @Nullable Game game;
+    private static boolean plobby = false;
 
     public static int startingY = 65;
 
@@ -35,12 +36,13 @@ public class GameTracker {
         if (state == State.MAP_WAITING) state = State.GAME_CONFIRMED;
     }
 
-    public static void confirm() {
+    public static void confirm(boolean plobby) {
         state = map == null ? State.MAP_WAITING : State.GAME_CONFIRMED;
         LOGGER.info("Game confirmed, state: " + state);
 
         if (MinecraftClient.getInstance().player == null) return;
         startingY = MinecraftClient.getInstance().player.getBlockY();
+        GameTracker.plobby = plobby;
     }
 
     public static void reject() {
@@ -52,6 +54,7 @@ public class GameTracker {
         if (state == State.GAME_REJECTED) return;
         game = new Game(map);
         game.start();
+        game.setPlobby(plobby);
         LOGGER.info("Game started! Map: " + map);
         state = State.GAME_STARTED;
     }

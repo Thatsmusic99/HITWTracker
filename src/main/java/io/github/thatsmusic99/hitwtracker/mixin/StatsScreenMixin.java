@@ -1,6 +1,5 @@
 package io.github.thatsmusic99.hitwtracker.mixin;
 
-import io.github.thatsmusic99.hitwtracker.gui.MCCIStatListWidget;
 import io.github.thatsmusic99.hitwtracker.gui.games.HITWStatScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;

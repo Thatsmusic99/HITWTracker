@@ -114,7 +114,7 @@ public class AllMatchesTab extends EntryListTab<AllMatchesTab.Entry> {
 
             final int colour = index % 2 == 1 ? 0xffffff : 11184810;
 
-            draw(context, String.valueOf(this.index), GAME_COLUMN, y, colour);
+            draw(context, (this.index) + (statistic.plobby() ? "*" : ""), GAME_COLUMN, y, colour);
             draw(context, String.valueOf(statistic.placement()), PLACEMENT_COLUMN, y, colour);
             draw(context, ties(statistic.ties(), colour), TIES_COLUMN, y, colour);
             draw(context, statistic.deathCause(), DEATH_COLUMN, y, colour);

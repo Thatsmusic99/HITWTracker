@@ -19,6 +19,7 @@ public class StatisticSerializer implements JsonSerializer<Statistic>, JsonDeser
         obj.add("time", new JsonPrimitive(src.seconds()));
         obj.add("score", new JsonPrimitive(src.score()));
         obj.add("date", new JsonPrimitive(src.date().getTime()));
+        obj.add("plobby", new JsonPrimitive(src.plobby()));
         return obj;
     }
 
@@ -32,8 +33,9 @@ public class StatisticSerializer implements JsonSerializer<Statistic>, JsonDeser
         final byte walls = object.get("walls").getAsByte();
         final short time = object.get("time").getAsShort();
         final short score = object.get("score").getAsShort();
+        final boolean plobby = object.get("plobby") != null && object.get("plobby").getAsBoolean();
         final Date date = new Date(object.get("date").getAsLong());
-        return new Statistic(placement, ties, map, deathCause, walls, time, score, date);
+        return new Statistic(placement, ties, map, deathCause, walls, time, score, plobby, date);
     }
 
     private JsonArray toJSON(String[] arr) {
