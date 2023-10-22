@@ -7,8 +7,11 @@
   ],
   "client": [
     "ChatHudMixin",
+    "EntityMixin",
+    "CobwebBlockMixin",
     "ClientPlayerEntityMixin",
     "ClientPlayNetworkHandlerMixin",
+    "FishingBobberEntityMixin",
     "InGameHudMixin",
     "MinecraftClientMixin",
     "ScreenMixin",
