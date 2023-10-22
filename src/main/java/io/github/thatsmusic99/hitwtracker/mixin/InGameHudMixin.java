@@ -1,6 +1,7 @@
 package io.github.thatsmusic99.hitwtracker.mixin;
 
 import io.github.thatsmusic99.hitwtracker.game.GameTracker;
+import io.github.thatsmusic99.hitwtracker.game.Trap;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -20,6 +21,7 @@ public class InGameHudMixin {
     private void showRecording(DrawContext context, float tickDelta, CallbackInfo ci) {
 
         if (client.options.hudHidden) return;
+        if (MinecraftClient.getInstance().player == null) return;
         if (!GameTracker.isTracking()) return;
 
         // Get the position to go for
@@ -28,5 +30,6 @@ public class InGameHudMixin {
         int y = 3;
 
         context.drawTextWithShadow(client.textRenderer, "Tracking", x, y, 16777215);
+        context.drawTextWithShadow(client.textRenderer, Trap.getTrap(MinecraftClient.getInstance().player).displayName, width - x, y, 16777215);
     }
 }
