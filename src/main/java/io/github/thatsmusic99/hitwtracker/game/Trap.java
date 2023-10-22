@@ -65,7 +65,17 @@ public enum Trap {
 
         return source != null
                 && source.getSource() != null
-                && source.getSource().getClass().isAssignableFrom(clazz);
+                && clazz.isAssignableFrom(source.getSource().getClass());
+    }
+
+    private static boolean checkArrowDamageSource(@NotNull ClientPlayerEntity player, @NotNull Class<? extends Entity> clazz) {
+
+        DamageSource source = ((DamageTracking) player).getLastDamageSource();
+
+        return source != null
+                && source.getSource() instanceof ArrowEntity
+                && source.getAttacker() != null
+                && clazz.isAssignableFrom(source.getAttacker().getClass());
     }
 
     public static Trap getTrap(@NotNull ClientPlayerEntity player) {
