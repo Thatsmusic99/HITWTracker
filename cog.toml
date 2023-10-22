@@ -1,0 +1,20 @@
+pre_bump_hooks = [
+    "scripts/pre-bump.sh {{latest}} {{version}}"
+]
+
+post_bump_hooks = [
+    "scripts/post-bump.sh {{version}}"
+]
+
+tag_prefix = "v"
+ignore_merge_commits = true
+
+[commit_types]
+dev = { changelog_title = "Development/Build Changes" }
+
+[changelog]
+path = "GITHUB_CHANGELOG.md"
+template = "remote"
+remote = "github.com"
+repository = "HITWTracker"
+owner = "Thatsmusic99"
