@@ -22,6 +22,7 @@ public class Game {
     private short score = -1;
     private boolean dirtyTime;
     private boolean saved;
+    private boolean plobby;
 
     public Game(@Nullable String mapName) {
         this.mapName = mapName;
@@ -67,6 +68,14 @@ public class Game {
         if (canSave()) save();
     }
 
+    public boolean isPlobby() {
+        return plobby;
+    }
+
+    public void setPlobby(boolean plobby) {
+        this.plobby = plobby;
+    }
+
     public void setDeathReason(@NotNull String deathReason) {
         this.deathReason = deathReason;
     }
@@ -91,7 +100,7 @@ public class Game {
         final Date date = new Date();
 
         // Create the statistic
-        final Statistic stat = new Statistic(placement, ties, actualMapName, actualDeathReason, walls, duration, score, date);
+        final Statistic stat = new Statistic(placement, ties, actualMapName, actualDeathReason, walls, duration, score, plobby, date);
         HITWTracker.get().getStatsManager().addStatToCache(stat);
         saved = true;
 

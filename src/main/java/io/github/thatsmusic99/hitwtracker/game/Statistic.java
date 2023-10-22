@@ -12,6 +12,7 @@ public record Statistic(
         byte walls,
         short seconds,
         short score,
+        boolean plobby,
         @NotNull Date date
 ) {
 }

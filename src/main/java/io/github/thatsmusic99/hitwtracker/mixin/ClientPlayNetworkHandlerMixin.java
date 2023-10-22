@@ -19,6 +19,8 @@ public abstract class ClientPlayNetworkHandlerMixin {
     private static final Logger logger = LoggerFactory.getLogger(ClientPlayNetworkHandlerMixin.class.getName());
     private static final Pattern MAP = Pattern.compile(".*MAP: (\\w+).*");
     private static final Pattern HITW_TITLE = Pattern.compile("MCCI: HOLE IN THE WALL ");
+    private static final Pattern HITW_PLOBBY_TITLE = Pattern.compile("MCCI: HOLE IN THE WALL {2}\\(Plobby\\)");
+    private static final byte FIREWORK_EXPLODE_UPDATE = 17;
 
     @ModifyVariable(at = @At("TAIL"), method = "onScoreboardObjectiveUpdate", argsOnly = true)
     private ScoreboardObjectiveUpdateS2CPacket onUpdate(ScoreboardObjectiveUpdateS2CPacket packet) {
@@ -28,7 +30,9 @@ public abstract class ClientPlayNetworkHandlerMixin {
         if (packet.getDisplayName().getString().isEmpty()) return packet;
 
         if (HITW_TITLE.matcher(packet.getDisplayName().getString()).matches()) {
-            GameTracker.confirm();
+            GameTracker.confirm(false);
+        } else if (HITW_PLOBBY_TITLE.matcher(packet.getDisplayName().getString()).matches()) {
+            GameTracker.confirm(true);
         } else {
             GameTracker.reject();
         }

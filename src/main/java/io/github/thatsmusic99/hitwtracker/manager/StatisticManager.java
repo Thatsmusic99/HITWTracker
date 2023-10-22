@@ -195,6 +195,7 @@ public class StatisticManager {
 
         // Go through each statistic...
         for (Statistic stat : stats) {
+            if (stat.plobby()) continue;
             placements += stat.placement();
             if (stat.ties().length > 0) ties++;
             if (stat.placement() == 1) wins++;
@@ -239,6 +240,7 @@ public class StatisticManager {
         // Get all statistics
         for (long time : this.dailyStats.keySet()) {
             for (Statistic statistic : this.dailyStats.get(time)) {
+                if (statistic.plobby()) continue;
 
                 // Overall stats
                 if (this.mapStatistics.containsKey("OVERALL")) {
@@ -281,6 +283,7 @@ public class StatisticManager {
 
             // Find each streak
             for (Statistic statistic : this.dailyStats.get(time)) {
+                if (statistic.plobby()) continue;
 
                 if (statistic.ties().length > 0) {
                     tieCount++;
@@ -345,6 +348,8 @@ public class StatisticManager {
         HashMap<String, Integer> ties = new HashMap<>();
         for (long time : this.dailyStats.keySet()) {
             for (Statistic stat : this.dailyStats.get(time)) {
+                // TODO - distinguish between plobby and normal ties
+                // if (stat.plobby()) continue;
 
                 // Go through each name
                 for (String name : stat.ties()) {
@@ -382,6 +387,8 @@ public class StatisticManager {
 
         existingStats.add(statistic);
         this.dailyStats.put(time, existingStats);
+
+        if (statistic.plobby()) return;
 
         updateDayStatistic(statistic);
         updateDeathStatistic(statistic);
