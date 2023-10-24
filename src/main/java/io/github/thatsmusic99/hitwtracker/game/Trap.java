@@ -21,7 +21,7 @@ public enum Trap {
 
     ARROW_STORM(10, "Arrow Storm", player -> ((DamageTracking) player).getLastDamageSource() != null
             && ((DamageTracking) player).getLastDamageSource().getSource() instanceof ArrowEntity
-            && ((DamageTracking) player).getLastDamageSource().getAttacker() == null),
+            && ((DamageTracking) player).getLastDamageSource().getAttacker() instanceof ArrowEntity),
     EGG(10, "Eggs", player -> checkDamageSource(player, EggEntity.class)),
     MATRIX(10, "Matrix", player -> checkDamageSource(player, FireballEntity.class)),
     CREEPY_CRAWLIES(20, "Creepy Crawlies!", player -> checkDamageSource(player, SpiderEntity.class)),
