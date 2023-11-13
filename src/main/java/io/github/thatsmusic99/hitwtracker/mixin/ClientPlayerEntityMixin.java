@@ -33,6 +33,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     private @Nullable VelocityStatus velocity;
     private byte count = 0;
     private @Nullable Timer cobwebTimer;
+    private boolean hotPotatoTracker = false;
 
     public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile) {
         super(world, profile);
@@ -95,17 +96,22 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 
     @Override
     public void onPotatoWarning() {
-
+        this.hotPotatoTracker = true;
     }
 
     @Override
     public void coolPotatoWarning() {
-
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                hotPotatoTracker = false;
+            }
+        }, 1000);
     }
 
     @Override
     public boolean hasPotatoWarning() {
-        return false;
+        return hotPotatoTracker;
     }
 
     private void checkSandfall() {
@@ -124,8 +130,8 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 
     @Override
     public void onExplosion() {
-        if (GameTracker.isTracking()) {
-            this.velocity = VelocityStatus.FISHING_RODS;
+        if (GameTracker.isTracking() && this.hotPotatoTracker) {
+            this.velocity = VelocityStatus.HOT_POTATO;
             this.count = 1;
             LOGGER.info("Explosion tracked");
         }
