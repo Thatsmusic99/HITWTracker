@@ -86,12 +86,14 @@ public class AllMatchesTab extends EntryListTab<AllMatchesTab.Entry> {
             Entry entry = this.getHoveredEntry();
             if (entry == null) return;
 
-            // See if there's a hover
+            // Don't worry if there's no ties
+            if (entry.statistic.ties().length == 0) return;
+
+            if (mouseX < TIES_COLUMN.getX() || mouseX > TIES_COLUMN.getX() + TIES_COLUMN.getWidth()) return;
+
+            context.drawTooltip(client.textRenderer, Text.of(String.join(", ", entry.statistic.ties())), mouseX, mouseY);
+
         }
-    }
-
-    protected void renderText() {
-
     }
 
     public class Entry extends EntryListTab<Entry>.Entry {
