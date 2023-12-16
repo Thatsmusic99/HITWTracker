@@ -39,6 +39,7 @@ public enum Trap {
     SNOWBALL_FIGHT(15, "Snowball Fight", player -> checkDamageSource(player, SnowballEntity.class)),
     COBWEBS(15, "Cobwebs", player -> ((VelocityTracking) player).getVelocityStatus() == VelocityTracking.VelocityStatus.COBWEBS),
     STICKY_SHOES(15, "Sticky Shoes", player -> ((VelocityTracking) player).getVelocityStatus() == VelocityTracking.VelocityStatus.STICKY_SHOES),
+    HOT_POTATO(10, "Hot Potato", player -> ((VelocityTracking) player).getVelocityStatus() == VelocityTracking.VelocityStatus.HOT_POTATO),
     SANDFALL(15, "Sandfall", player -> ((VelocityTracking) player).getVelocityStatus() == VelocityTracking.VelocityStatus.SANDFALL),
     LEG_DAY(10, "Leg Day", player -> player.hasStatusEffect(StatusEffects.SLOWNESS)),
     LOW_GRAVITY(10, "Low Gravity", player -> player.hasStatusEffect(StatusEffects.SLOW_FALLING)),

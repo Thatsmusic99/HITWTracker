@@ -31,9 +31,11 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     private long lastInAir = System.currentTimeMillis() / 50;
     private @Nullable DamageSource source;
     private @Nullable VelocityStatus velocity;
-    private byte count = 0;
     private @Nullable Timer cobwebTimer;
     private boolean hotPotatoTracker = false;
+    private boolean explosion = false;
+    private boolean launched = false;
+    private byte count = 0;
 
     public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile) {
         super(world, profile);
@@ -62,11 +64,9 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     @Override
     public void onDamaged(DamageSource damageSource) {
         super.onDamaged(damageSource);
-        LOGGER.info("onDamage called");
         if (GameTracker.isTracking()) {
             this.source = damageSource;
             this.count = 1;
-            LOGGER.info("Damage tracked");
         }
     }
 
@@ -75,7 +75,6 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         if (GameTracker.isTracking()) {
             this.velocity = VelocityStatus.SANDFALL;
             this.count = 1;
-            LOGGER.info("Sandfall tracked");
         }
     }
 
@@ -129,11 +128,22 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     }
 
     @Override
-    public void onExplosion() {
+    public void onExplosionSound() {
         if (GameTracker.isTracking() && this.hotPotatoTracker) {
-            this.velocity = VelocityStatus.HOT_POTATO;
+            this.explosion = true;
             this.count = 1;
-            LOGGER.info("Explosion tracked");
+            if (!this.launched) return;
+            this.velocity = VelocityStatus.HOT_POTATO;
+        }
+    }
+
+    @Override
+    public void onExplosionLaunch() {
+        if (GameTracker.isTracking() && this.hotPotatoTracker) {
+            this.launched = true;
+            this.count = 1;
+            if (!this.explosion) return;
+            this.velocity = VelocityStatus.HOT_POTATO;
         }
     }
 

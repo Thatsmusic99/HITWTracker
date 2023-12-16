@@ -8,5 +8,7 @@ public interface HotPotatoTracking {
 
     boolean hasPotatoWarning();
 
-    void onExplosion();
+    void onExplosionSound();
+
+    void onExplosionLaunch();
 }

@@ -62,26 +62,26 @@ public abstract class ClientPlayNetworkHandlerMixin {
         return packet;
     }
 
-//    @ModifyVariable(at = @At("TAIL"), method = "onEntityVelocityUpdate", argsOnly = true)
-//    private EntityVelocityUpdateS2CPacket onVelocityUpdate(EntityVelocityUpdateS2CPacket packet) {
-//
-//        Vec3d velocity = new Vec3d(packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ());
-//        double length = velocity.length();
-//        Entity entity = MinecraftClient.getInstance().player.getEntityWorld().getEntityById(packet.getId());
-//        if (MinecraftClient.getInstance().player.getId() == packet.getId() || length > 8000 && entity instanceof PlayerEntity) {
-//            LOGGER.info("Velocity update detected, velocity: " + length + ", player: " + entity.getName().getString());
-//        }
-//        return packet;
-//    }
+    @ModifyVariable(at = @At("TAIL"), method = "onEntityVelocityUpdate", argsOnly = true)
+    private EntityVelocityUpdateS2CPacket onVelocityUpdate(EntityVelocityUpdateS2CPacket packet) {
+
+        if (MinecraftClient.getInstance().player.getId() == packet.getId()) {
+            ((HotPotatoTracking) MinecraftClient.getInstance().player).onExplosionLaunch();
+        }
+        return packet;
+    }
+
+    @ModifyVariable(at = @At("TAIL"), method = "onExplosion", argsOnly = true)
+    private ExplosionS2CPacket onExplosion(ExplosionS2CPacket packet) {
+        if (!packet.getAffectedBlocks().isEmpty()) return packet;
+        ((HotPotatoTracking) MinecraftClient.getInstance().player).onExplosionSound();
+        return packet;
+    }
 
     @ModifyVariable(at = @At("HEAD"), method = "onWorldBorderInitialize", argsOnly = true)
     private WorldBorderInitializeS2CPacket onBorderUpdate(WorldBorderInitializeS2CPacket packet) {
 
-        LOGGER.info("World border initialised, size: " + packet.getSize() + ", blocks: " + packet.getWarningBlocks() + ", time: " + packet.getWarningTime());
         if (MinecraftClient.getInstance().player == null) return packet;
-
-        LOGGER.info("Hot potato detected! This check is still experimental, please send logs to the developer. " +
-                "Warning block count: " + packet.getWarningBlocks());
 
         final PlayerEntity player = MinecraftClient.getInstance().player;
         final HotPotatoTracking playerPotato = ((HotPotatoTracking) player);
