@@ -78,6 +78,11 @@ public class AllMatchesTab extends EntryListTab<AllMatchesTab.Entry> {
     }
 
     @Override
+    public int getRowWidth() {
+        return this.grid.getWidth();
+    }
+
+    @Override
     protected void renderDecorations(DrawContext context, int mouseX, int mouseY) {
         super.renderDecorations(context, mouseX, mouseY);
 
