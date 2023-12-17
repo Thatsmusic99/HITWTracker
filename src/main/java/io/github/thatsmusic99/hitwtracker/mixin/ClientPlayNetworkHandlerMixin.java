@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 public abstract class ClientPlayNetworkHandlerMixin {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientPlayNetworkHandlerMixin.class.getName());
-    private static final Pattern MAP = Pattern.compile(".*MAP: (\\w+).*");
+    private static final Pattern MAP = Pattern.compile(".*MAP: ([\\w\\s]+).*");
     private static final Pattern HITW_TITLE = Pattern.compile("MCCI: HOLE IN THE WALL ");
     private static final Pattern HITW_PLOBBY_TITLE = Pattern.compile("MCCI: HOLE IN THE WALL {2}\\(Plobby\\)");
     private static final byte FIREWORK_EXPLODE_UPDATE = 17;
