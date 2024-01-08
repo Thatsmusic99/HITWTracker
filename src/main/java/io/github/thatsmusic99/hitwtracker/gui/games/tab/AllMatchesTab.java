@@ -3,6 +3,7 @@ package io.github.thatsmusic99.hitwtracker.gui.games.tab;
 import io.github.thatsmusic99.hitwtracker.HITWTracker;
 import io.github.thatsmusic99.hitwtracker.game.Statistic;
 import io.github.thatsmusic99.hitwtracker.gui.tab.EntryListTab;
+import io.github.thatsmusic99.hitwtracker.manager.StatisticManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -70,7 +71,12 @@ public class AllMatchesTab extends EntryListTab<AllMatchesTab.Entry> {
 
         var style = mutableText.getStyle();
 
-        style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(String.join(", ", ties))));
+        String[] usernames = new String[ties.length];
+        for (int i = 0; i < usernames.length; i++) {
+            usernames[i] = StatisticManager.getUsername(ties[i]);
+        }
+
+        style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(String.join(", ", usernames))));
         style = style.withUnderline(true);
         style = style.withColor(TextColor.fromRgb(0xffff66));
 

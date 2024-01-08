@@ -1,17 +1,22 @@
 package io.github.thatsmusic99.hitwtracker.listener;
 
+import io.github.thatsmusic99.hitwtracker.HITWTracker;
 import io.github.thatsmusic99.hitwtracker.game.GameTracker;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ServerMessageListener {
 
-    private static final Logger logger = Logger.getLogger(ServerMessageListener.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ServerMessageListener.class.getName());
     private static final Pattern GAME_STARTED = Pattern.compile("^\\[.] Game Started!");
     private static final Pattern PLAYER_NAME = Pattern.compile("[^a-zA-Z_0-9]*(\\w+)[^a-zA-Z_0-9]*");
     private static final Pattern GAME_LOST = Pattern.compile("^\\[.] .+(\\w+), you were eliminated in (\\d+)\\w+ \\(Score: (\\d+).\\)");
@@ -101,7 +106,7 @@ public class ServerMessageListener {
 
         // Split up names
         String[] rawNames = content.split(",");
-        List<String> finalNames = new ArrayList<>();
+        List<String> finalNames = new ArrayList<>(rawNames.length - 1);
 
         // For each name, strip extra details and get results
         for (String rawName : rawNames) {
@@ -111,10 +116,29 @@ public class ServerMessageListener {
 
             // Ensure it's not our own name, because that would be silly
             if (self.equals(finalName)) continue;
+
+            // Try to use their UUID
+            final PlayerEntity player = getPlayer(finalName);
+            if (player != null) {
+                finalNames.add(player.getUuidAsString());
+                CompletableFuture.runAsync(() ->
+                        HITWTracker.get().getUserCache().add(player.getGameProfile()), HITWTracker.executorService);
+                continue;
+            }
+
+
+            LOGGER.warning("No player manager found, saving " + finalName + " by their name.");
             finalNames.add(finalName);
         }
 
         // Return the result
         return finalNames.toArray(new String[0]);
+    }
+
+    private static @Nullable PlayerEntity getPlayer(final @NotNull String name) {
+        for (PlayerEntity entity : MinecraftClient.getInstance().player.getWorld().getPlayers()) {
+            if (entity.getGameProfile().getName().equals(name)) return entity;
+        }
+        return null;
     }
 }

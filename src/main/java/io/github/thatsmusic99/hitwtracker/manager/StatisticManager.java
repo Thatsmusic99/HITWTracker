@@ -2,6 +2,7 @@ package io.github.thatsmusic99.hitwtracker.manager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mojang.authlib.GameProfile;
 import io.github.thatsmusic99.hitwtracker.HITWTracker;
 import io.github.thatsmusic99.hitwtracker.game.Statistic;
 import io.github.thatsmusic99.hitwtracker.serializer.StatisticSerializer;
@@ -183,7 +184,8 @@ public class StatisticManager {
         if (stats == null) return null;
 
         final Date date = new Date(time);
-        final int games = stats.size();
+
+        int games = stats.size();
 
         int placements = 0;
         short ties = 0;
@@ -195,7 +197,10 @@ public class StatisticManager {
 
         // Go through each statistic...
         for (Statistic stat : stats) {
-            if (stat.plobby()) continue;
+            if (stat.plobby()) {
+                games--;
+                continue;
+            }
             placements += stat.placement();
             if (stat.ties().length > 0) ties++;
             if (stat.placement() == 1) wins++;
@@ -353,7 +358,8 @@ public class StatisticManager {
 
                 // Go through each name
                 for (String name : stat.ties()) {
-                    ties.put(name, ties.getOrDefault(name, 0) + 1);
+                    final String username = getUsername(name);
+                    ties.put(username, ties.getOrDefault(username, 0) + 1);
                 }
             }
         }
@@ -387,13 +393,13 @@ public class StatisticManager {
 
         existingStats.add(statistic);
         this.dailyStats.put(time, existingStats);
+        updateTieStatistic(statistic);
 
         if (statistic.plobby()) return;
 
         updateDayStatistic(statistic);
         updateDeathStatistic(statistic);
         updateMapStatistic(statistic);
-        updateTieStatistic(statistic);
     }
 
     private void updateDayStatistic(final @NotNull Statistic statistic) {
@@ -702,7 +708,7 @@ public class StatisticManager {
         private int count;
 
         public TieStatistic(@NotNull String player, int count) {
-            this.player = player;
+            this.player = getUsername(player);
             this.count = count;
         }
 
@@ -713,5 +719,19 @@ public class StatisticManager {
         public int getCount() {
             return count;
         }
+    }
+
+    public static @NotNull String getUsername(final @NotNull String player) {
+        final UUID uuid;
+        try {
+            uuid = UUID.fromString(player);
+        } catch (IllegalArgumentException ex) {
+            return player;
+        }
+
+        final Optional<GameProfile> profile = HITWTracker.get().getUserCache().getByUuid(uuid);
+        if (profile.isEmpty()) return player;
+
+        return profile.get().getName();
     }
 }

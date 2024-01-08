@@ -24,6 +24,10 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
 }
 
+loom {
+    accessWidenerPath.set(file("src/main/resources/hitwtracker.accesswidener"))
+}
+
 var targetJavaVersion = 17
 tasks {
     withType<JavaCompile> {

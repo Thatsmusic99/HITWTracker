@@ -9,6 +9,7 @@
   "license": "LGPL-3.0",
   "icon": "assets/HITWTracker/icon.png",
   "environment": "*",
+  "accessWidener" : "hitwtracker.accesswidener",
   "entrypoints": {
     "client": [
       "io.github.thatsmusic99.hitwtracker.client.HITWTrackerClient"
