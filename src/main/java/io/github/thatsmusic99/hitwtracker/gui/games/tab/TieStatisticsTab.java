@@ -1,12 +1,12 @@
 package io.github.thatsmusic99.hitwtracker.gui.games.tab;
 
 import io.github.thatsmusic99.hitwtracker.HITWTracker;
+import io.github.thatsmusic99.hitwtracker.client.HITWTrackerClient;
 import io.github.thatsmusic99.hitwtracker.gui.tab.EntryListTab;
 import io.github.thatsmusic99.hitwtracker.manager.StatisticManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.tab.GridScreenTab;
 import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
@@ -60,6 +60,9 @@ public class TieStatisticsTab extends EntryListTab<TieStatisticsTab.Entry> {
 
             draw(context, stat.getPlayer(), PLAYER_COLUMN, y, colour);
             draw(context, String.valueOf(stat.getCount()), TIES_COLUMN, y, colour);
+
+            context.drawTexture(HITWTrackerClient.get().getProfileManager().get(stat.getPlayer()),
+                    PLAYER_COLUMN.getX() - 16, y, 0, 0, 8, 8, 8, 8);
         }
     }
 }
