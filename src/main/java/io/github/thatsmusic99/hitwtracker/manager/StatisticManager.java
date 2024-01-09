@@ -210,6 +210,8 @@ public class StatisticManager {
             shortestTime = stat.placement() == 1 ? (short) Math.min(shortestTime, stat.seconds()) : shortestTime;
         }
 
+        if (games == 0) return null;
+
         final float avgPlace = placements / (float) games;
 
         return new DayStatistic(date, games, avgPlace, ties, wins, topThrees, walls, totalTime, shortestTime);
