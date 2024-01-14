@@ -65,6 +65,8 @@ public abstract class ClientPlayNetworkHandlerMixin {
     @ModifyVariable(at = @At("TAIL"), method = "onEntityVelocityUpdate", argsOnly = true)
     private EntityVelocityUpdateS2CPacket onVelocityUpdate(EntityVelocityUpdateS2CPacket packet) {
 
+        if (MinecraftClient.getInstance().player == null) return packet;
+
         if (MinecraftClient.getInstance().player.getId() == packet.getId()) {
             ((HotPotatoTracking) MinecraftClient.getInstance().player).onExplosionLaunch();
         }
@@ -73,7 +75,10 @@ public abstract class ClientPlayNetworkHandlerMixin {
 
     @ModifyVariable(at = @At("TAIL"), method = "onExplosion", argsOnly = true)
     private ExplosionS2CPacket onExplosion(ExplosionS2CPacket packet) {
+
         if (!packet.getAffectedBlocks().isEmpty()) return packet;
+        if (MinecraftClient.getInstance().player == null) return packet;
+
         ((HotPotatoTracking) MinecraftClient.getInstance().player).onExplosionSound();
         return packet;
     }

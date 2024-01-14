@@ -12,8 +12,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class MiscStatisticsTab extends EntryListTab<MiscStatisticsTab.Entry> {
 
-    private final @NotNull Column STATISTIC_COLUMN;
-    private final @NotNull Column VALUE_COLUMN;
+    private final @NotNull OrderableColumn STATISTIC_COLUMN;
+    private final @NotNull OrderableColumn VALUE_COLUMN;
 
     public MiscStatisticsTab(final @NotNull MinecraftClient client,
                              final @NotNull Screen parent,

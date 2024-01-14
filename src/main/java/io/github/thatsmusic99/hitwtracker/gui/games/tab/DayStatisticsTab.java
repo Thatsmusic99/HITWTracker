@@ -16,7 +16,7 @@ import java.util.Comparator;
 
 public class DayStatisticsTab extends EntryListTab<DayStatisticsTab.Entry> {
 
-    private final @NotNull Column DATE_COLUMN;
+    private final @NotNull OrderableColumn DATE_COLUMN;
     private final @NotNull TextWidget GAMES_COLUMN;
     private final @NotNull TextWidget AVG_PLACE_COLUMN;
     private final @NotNull TextWidget TIE_COUNT_COLUMN;

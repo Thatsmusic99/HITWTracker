@@ -495,10 +495,10 @@ public class StatisticManager {
             return (seconds / 60) + "m" + (remainingSecs == 0 ? "" : " " + remainingSecs + "s");
         }
         int remainingSecs = (seconds % 60);
-        int remainingMins = (seconds % 3600) / 60;
+        int remainingMinutes = (seconds % 3600) / 60;
         int remainingHours = seconds / 3600;
         return remainingHours + "hr"
-                + (remainingMins == 0 ? "" : " " + remainingMins + "m")
+                + (remainingMinutes == 0 ? "" : " " + remainingMinutes + "m")
                 + (remainingSecs == 0 ? "" : " " + remainingSecs + "s");
     }
 

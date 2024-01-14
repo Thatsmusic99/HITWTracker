@@ -90,13 +90,13 @@ public abstract class EntryListTab<E extends AlwaysSelectedEntryListWidget.Entry
         this.children().sort(comparator);
     }
 
-    protected @NotNull Column of(String text, Comparator<E> comparator) {
+    protected @NotNull OrderableColumn of(String text, Comparator<E> comparator) {
 
         final var textContent = new LiteralTextContent(text);
         var mutableText = MutableText.of(textContent);
         mutableText = mutableText.setStyle(mutableText.getStyle().withBold(true).withColor(0xffffff));
 
-        final var textWidget = new Column(mutableText, comparator);
+        final var textWidget = new OrderableColumn(mutableText, comparator);
 
         textWidget.setWidth(Math.max(40, textWidget.getWidth()));
 
@@ -198,7 +198,7 @@ public abstract class EntryListTab<E extends AlwaysSelectedEntryListWidget.Entry
         }
     }
 
-    public class Column extends TextWidget {
+    public class OrderableColumn extends TextWidget {
 
         private static final int DIRECTION_DOWN = 0;
         private static final int DIRECTION_UP = 1;
@@ -210,7 +210,7 @@ public abstract class EntryListTab<E extends AlwaysSelectedEntryListWidget.Entry
         private final @NotNull Text messageDown;
         private int direction = 2;
 
-        public Column(@NotNull Text message, Comparator<E> comparator) {
+        public OrderableColumn(@NotNull Text message, Comparator<E> comparator) {
             super(message, client.textRenderer);
             this.comparator = comparator;
             this.reverseComparator = comparator.reversed();
@@ -241,7 +241,7 @@ public abstract class EntryListTab<E extends AlwaysSelectedEntryListWidget.Entry
 
                 grid.forEachChild(widget -> {
 
-                    if (widget instanceof EntryListTab<?>.Column column && widget != this) {
+                    if (widget instanceof EntryListTab<?>.OrderableColumn column && widget != this) {
                         column.setDirection(DIRECTION_NONE);
                     }
                 });

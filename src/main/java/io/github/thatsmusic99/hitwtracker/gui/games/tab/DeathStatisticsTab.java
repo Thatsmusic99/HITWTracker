@@ -14,9 +14,9 @@ import java.util.Comparator;
 
 public class DeathStatisticsTab extends EntryListTab<DeathStatisticsTab.Entry> {
 
-    private final @NotNull Column DEATH_CAUSE_COLUMN;
-    private final @NotNull Column COUNT_COLUMN;
-    private final @NotNull Column RATE_COLUMN;
+    private final @NotNull OrderableColumn DEATH_CAUSE_COLUMN;
+    private final @NotNull OrderableColumn COUNT_COLUMN;
+    private final @NotNull OrderableColumn RATE_COLUMN;
 
     public DeathStatisticsTab(final @NotNull MinecraftClient client,
                               final @NotNull Screen parent,

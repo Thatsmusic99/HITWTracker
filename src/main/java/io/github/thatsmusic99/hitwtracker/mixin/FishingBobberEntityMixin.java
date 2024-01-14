@@ -19,11 +19,12 @@ public class FishingBobberEntityMixin {
     @Inject(at = @At("TAIL"), method = "pullHookedEntity")
     private void checkEntity(Entity entity, CallbackInfo ci) {
 
-        LOGGER.info("Hooked entity pulled: " + entity.getEntityName());
+        LOGGER.debug("Hooked entity pulled: " + entity.getEntityName());
 
         // Check if it's ourselves
         if (entity != MinecraftClient.getInstance().player) return;
-        LOGGER.info("Hooked entity pulled is own player");
+
+        LOGGER.debug("Hooked entity pulled is own player");
 
         ((VelocityTracking) MinecraftClient.getInstance().player).onRodPull();
     }

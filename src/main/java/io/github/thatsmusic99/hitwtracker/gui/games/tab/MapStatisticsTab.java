@@ -14,18 +14,18 @@ import java.util.Comparator;
 
 public class MapStatisticsTab extends EntryListTab<MapStatisticsTab.Entry> {
 
-    private final @NotNull Column MAP_COLUMN;
-    private final @NotNull Column GAMES_COLUMN;
-    private final @NotNull Column AVERAGE_PLACEMENT_COLUMN;
-    private final @NotNull Column TOP_DEATH_CAUSE_COLUMN;
-    private final @NotNull Column TIES_COLUMN;
-    private final @NotNull Column LARGEST_TIE_COLUMN;
-    private final @NotNull Column MOST_TIED_WITH_COLUMN;
-    private final @NotNull Column WINS_COLUMN;
-    private final @NotNull Column TOP_THREES_COLUMN;
-    private final @NotNull Column WALLS_COLUMN;
-    private final @NotNull Column AVERAGE_TIME_COLUMN;
-    private final @NotNull Column FASTEST_TIME_COLUMN;
+    private final @NotNull OrderableColumn MAP_COLUMN;
+    private final @NotNull OrderableColumn GAMES_COLUMN;
+    private final @NotNull OrderableColumn AVERAGE_PLACEMENT_COLUMN;
+    private final @NotNull OrderableColumn TOP_DEATH_CAUSE_COLUMN;
+    private final @NotNull OrderableColumn TIES_COLUMN;
+    private final @NotNull OrderableColumn LARGEST_TIE_COLUMN;
+    private final @NotNull OrderableColumn MOST_TIED_WITH_COLUMN;
+    private final @NotNull OrderableColumn WINS_COLUMN;
+    private final @NotNull OrderableColumn TOP_THREES_COLUMN;
+    private final @NotNull OrderableColumn WALLS_COLUMN;
+    private final @NotNull OrderableColumn AVERAGE_TIME_COLUMN;
+    private final @NotNull OrderableColumn FASTEST_TIME_COLUMN;
 
     public MapStatisticsTab(final @NotNull MinecraftClient client,
                             final @NotNull Screen parent,

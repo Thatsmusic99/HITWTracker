@@ -18,6 +18,7 @@ public class CobwebBlockMixin {
     @Inject(at = @At("TAIL"), method = "onEntityCollision")
     private void trackCollision(BlockState state, World world, BlockPos pos, Entity entity, CallbackInfo ci) {
         if (entity != MinecraftClient.getInstance().player) return;
+        if (MinecraftClient.getInstance().player == null) return;
 
         ((VelocityTracking) MinecraftClient.getInstance().player).onWeb();
     }

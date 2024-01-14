@@ -17,14 +17,14 @@ import java.util.Comparator;
 
 public class AllMatchesTab extends EntryListTab<AllMatchesTab.Entry> {
 
-    private final @NotNull Column GAME_COLUMN;
-    private final @NotNull TextWidget PLACEMENT_COLUMN;
-    private final @NotNull TextWidget TIES_COLUMN;
-    private final @NotNull TextWidget DEATH_COLUMN;
-    private final @NotNull TextWidget TIME_COLUMN;
-    private final @NotNull TextWidget WALLS_COLUMN;
-    private final @NotNull TextWidget MAP_COLUMN;
-    private final @NotNull TextWidget DATE_COLUMN;
+    private final @NotNull OrderableColumn GAME_COLUMN;
+    private final @NotNull OrderableColumn PLACEMENT_COLUMN;
+    private final @NotNull OrderableColumn TIES_COLUMN;
+    private final @NotNull OrderableColumn DEATH_COLUMN;
+    private final @NotNull OrderableColumn TIME_COLUMN;
+    private final @NotNull OrderableColumn WALLS_COLUMN;
+    private final @NotNull OrderableColumn MAP_COLUMN;
+    private final @NotNull OrderableColumn DATE_COLUMN;
 
     public AllMatchesTab(MinecraftClient minecraftClient, @NotNull Screen parent, int top, int bottom, int m) {
         super(minecraftClient, parent, top, bottom, m);

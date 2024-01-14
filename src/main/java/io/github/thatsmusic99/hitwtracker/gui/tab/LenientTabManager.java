@@ -5,7 +5,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tab.Tab;
 import net.minecraft.client.gui.tab.TabManager;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -25,9 +24,11 @@ public class LenientTabManager<T extends Widget & Drawable & Selectable> extends
     private final Consumer<ClickableWidget> tabUnloadConsumer;
     private @Nullable Tab tab;
     private @Nullable ScreenRect tabArea;
-    private @NotNull HITWStatScreen parent;
+    private final @NotNull HITWStatScreen parent;
 
-    public LenientTabManager(HITWStatScreen parent, Consumer<T> tabLoadConsumer, Consumer<T> tabUnloadConsumer) {
+    public LenientTabManager(final @NotNull HITWStatScreen parent,
+                             final Consumer<T> tabLoadConsumer,
+                             final Consumer<T> tabUnloadConsumer) {
         super(widget -> tabLoadConsumer.accept((T) widget), widget -> tabUnloadConsumer.accept((T) widget));
         this.lenientTabLoadConsumer = tabLoadConsumer;
         this.lenientTabUnloadConsumer = tabUnloadConsumer;

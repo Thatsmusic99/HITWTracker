@@ -118,9 +118,4 @@ public class GameSaver {
 
         return content.toString();
     }
-
-    private interface NoSuchFileConsumer<T> {
-
-        T get() throws FileNotFoundException;
-    }
 }

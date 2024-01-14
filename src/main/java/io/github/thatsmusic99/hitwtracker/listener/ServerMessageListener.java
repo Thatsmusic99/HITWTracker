@@ -24,8 +24,6 @@ public class ServerMessageListener {
     private static final Pattern GAME_WINNERS = Pattern.compile("^\\[.] Game Winner\\(s\\): (.+)");
     private static final Pattern GAME_SURVIVED = Pattern.compile("\\s*.*Finished in ((\\d+)m)? ?((\\d+)s)?\\.");
     private static final Pattern GAME_DODGED = Pattern.compile("\\s*.*Dodged (\\d+) walls\\.");
-    private static final Pattern GAME_TRAPS = Pattern.compile("\\s*.*Survived (\\d+) traps\\.");
-    private static final Pattern GAME_PLAYERS = Pattern.compile("\\s*.*Outlived (\\d+) players.\\.");
 
 
     public static void checkMessage(String content) {
@@ -136,6 +134,7 @@ public class ServerMessageListener {
     }
 
     private static @Nullable PlayerEntity getPlayer(final @NotNull String name) {
+        if (MinecraftClient.getInstance().player == null) return null;
         for (PlayerEntity entity : MinecraftClient.getInstance().player.getWorld().getPlayers()) {
             if (entity.getGameProfile().getName().equals(name)) return entity;
         }

@@ -15,8 +15,8 @@ import java.util.Comparator;
 
 public class TieStatisticsTab extends EntryListTab<TieStatisticsTab.Entry> {
 
-    private final @NotNull Column PLAYER_COLUMN;
-    private final @NotNull Column TIES_COLUMN;
+    private final @NotNull OrderableColumn PLAYER_COLUMN;
+    private final @NotNull OrderableColumn TIES_COLUMN;
 
     public TieStatisticsTab(final @NotNull MinecraftClient client,
                             final @NotNull Screen parent,
