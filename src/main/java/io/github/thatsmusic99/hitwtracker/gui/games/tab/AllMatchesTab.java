@@ -71,12 +71,6 @@ public class AllMatchesTab extends EntryListTab<AllMatchesTab.Entry> {
 
         var style = mutableText.getStyle();
 
-        String[] usernames = new String[ties.length];
-        for (int i = 0; i < usernames.length; i++) {
-            usernames[i] = StatisticManager.getUsername(ties[i]);
-        }
-
-        style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(String.join(", ", usernames))));
         style = style.withUnderline(true);
         style = style.withColor(TextColor.fromRgb(0xffff66));
 
@@ -102,7 +96,12 @@ public class AllMatchesTab extends EntryListTab<AllMatchesTab.Entry> {
 
             if (mouseX < TIES_COLUMN.getX() || mouseX > TIES_COLUMN.getX() + TIES_COLUMN.getWidth()) return;
 
-            context.drawTooltip(client.textRenderer, Text.of(String.join(", ", entry.statistic.ties())), mouseX, mouseY);
+            String[] usernames = new String[entry.statistic.ties().length];
+            for (int i = 0; i < usernames.length; i++) {
+                usernames[i] = StatisticManager.getUsername(entry.statistic.ties()[i]);
+            }
+
+            context.drawTooltip(client.textRenderer, Text.of(String.join(", ", usernames)), mouseX, mouseY);
 
         }
     }

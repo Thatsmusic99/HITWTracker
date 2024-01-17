@@ -602,7 +602,7 @@ public class StatisticManager {
             this.ties = ties;
             this.largestTie = largestTie;
             this.tiedWith = tiedWith;
-            this.mostTiedWith = getTopResult(tiedWith);
+            this.mostTiedWith = getUsername(getTopResult(tiedWith));
             this.wins = wins;
             this.topThrees = topThrees;
             this.walls = walls;
@@ -619,7 +619,7 @@ public class StatisticManager {
             if (statistic.ties().length > 0) this.ties++;
             this.largestTie = Math.max(this.largestTie, statistic.ties().length);
             this.tiedWith.addAll(Arrays.asList(statistic.ties()));
-            this.mostTiedWith = getTopResult(this.tiedWith);
+            this.mostTiedWith = getUsername(getTopResult(this.tiedWith));
             if (statistic.placement() == 1) this.wins++;
             if (statistic.placement() < 4) this.topThrees++;
             this.walls += statistic.walls();
@@ -725,7 +725,8 @@ public class StatisticManager {
         }
     }
 
-    public static @NotNull String getUsername(final @NotNull String player) {
+    public static @NotNull String getUsername(final @Nullable String player) {
+        if (player == null) return "N/A";
         final UUID uuid;
         try {
             uuid = UUID.fromString(player);
