@@ -133,7 +133,9 @@ public class StatisticManager {
             final HashMap<Long, DayStatistic> stats = new LinkedHashMap<>();
 
             for (long time : this.times) {
-                stats.put(time, formDayStatistics(time));
+                final var stat = formDayStatistics(time);
+                if (stat == null) continue;
+                stats.put(time, stat);
             }
 
             return stats;
