@@ -4,11 +4,11 @@ import io.github.thatsmusic99.hitwtracker.HITWTracker;
 import io.github.thatsmusic99.hitwtracker.game.Statistic;
 import io.github.thatsmusic99.hitwtracker.gui.tab.EntryListTab;
 import io.github.thatsmusic99.hitwtracker.manager.StatisticManager;
+import io.github.thatsmusic99.hitwtracker.util.MiscUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.GridWidget;
-import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.text.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -132,8 +132,8 @@ public class AllMatchesTab extends EntryListTab<AllMatchesTab.Entry> {
             draw(context, statistic.deathCause(), DEATH_COLUMN, y, colour);
             draw(context, toTime(statistic.seconds()), TIME_COLUMN, y, colour);
             draw(context, String.valueOf(statistic.walls()), WALLS_COLUMN, y, colour);
-            draw(context, statistic.map(), MAP_COLUMN, y, colour);
-            draw(context, new SimpleDateFormat("dd/MM/yyyy").format(statistic.date()), DATE_COLUMN, y, colour);
+            draw(context, MiscUtils.capitalise(statistic.map()), MAP_COLUMN, y, colour);
+            draw(context, new SimpleDateFormat("HH:mm dd/MM/yyyy").format(statistic.date()), DATE_COLUMN, y, colour);
         }
 
         public int getIndex() {
