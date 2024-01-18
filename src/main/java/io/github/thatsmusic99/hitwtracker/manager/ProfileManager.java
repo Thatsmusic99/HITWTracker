@@ -1,5 +1,7 @@
 package io.github.thatsmusic99.hitwtracker.manager;
 
+import com.mojang.blaze3d.platform.TextureUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.thatsmusic99.hitwtracker.HITWTracker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
@@ -93,6 +95,12 @@ public class ProfileManager {
         try (FileInputStream stream = new FileInputStream(new File(cache, name + ".png"))) {
             final NativeImage image = NativeImage.read(stream);
             final NativeImageBackedTexture texture = new NativeImageBackedTexture(image);
+
+            RenderSystem.recordRenderCall(() -> {
+                TextureUtil.prepareImage(texture.getGlId(), image.getWidth(), image.getHeight());
+                texture.upload();
+            });
+
             final Identifier id = new Identifier("hitwtracker", "player_" + name.toLowerCase());
 
             MinecraftClient.getInstance().getTextureManager().registerTexture(id, texture);
