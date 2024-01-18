@@ -354,7 +354,7 @@ public class StatisticManager {
     private @NotNull List<TieStatistic> formTieStatistics() {
 
         // Go through each statistic for each day
-        HashMap<String, Integer> ties = new HashMap<>();
+        HashMap<String, List<String>> ties = new HashMap<>();
         for (long time : this.dailyStats.keySet()) {
             for (Statistic stat : this.dailyStats.get(time)) {
                 // TODO - distinguish between plobby and normal ties
@@ -363,7 +363,9 @@ public class StatisticManager {
                 // Go through each name
                 for (String name : stat.ties()) {
                     final String username = getUsername(name);
-                    ties.put(username, ties.getOrDefault(username, 0) + 1);
+                    final var list = ties.getOrDefault(username, new ArrayList<>());
+                    list.add(stat.map());
+                    ties.put(username, list);
                 }
             }
         }
@@ -371,7 +373,12 @@ public class StatisticManager {
         // Go through each name and create tie stat records
         List<TieStatistic> tieStats = new ArrayList<>();
         for (String name : ties.keySet()) {
-            tieStats.add(new TieStatistic(name, ties.get(name)));
+            final var stat = new TieStatistic(name, ties.get(name).size());
+            tieStats.add(stat);
+
+            for (String map : ties.get(name)) {
+                stat.add(map);
+            }
         }
 
         this.tieStatistics.addAll(tieStats);
@@ -465,6 +472,7 @@ public class StatisticManager {
             for (String player : statistic.ties()) {
                 if (tieStatistic.player.equals(player)) {
                     tieStatistic.count++;
+                    tieStatistic.add(statistic.map());
                     tiedPlayersAdded.remove(player);
                 }
             }
@@ -710,10 +718,12 @@ public class StatisticManager {
 
         private final @NotNull String player;
         private int count;
+        private final HashMap<String, Integer> maps;
 
         public TieStatistic(@NotNull String player, int count) {
             this.player = getUsername(player);
             this.count = count;
+            this.maps = new HashMap<>();
         }
 
         public @NotNull String getPlayer() {
@@ -722,6 +732,16 @@ public class StatisticManager {
 
         public int getCount() {
             return count;
+        }
+
+        public int getMapCount(final @NotNull String map) {
+            return this.maps.getOrDefault(map.toLowerCase(), 0);
+        }
+
+        protected void add(final @NotNull String map) {
+            int count = getMapCount(map);
+            count++;
+            this.maps.put(map.toLowerCase(), count);
         }
     }
 
