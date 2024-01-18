@@ -7,6 +7,7 @@ import io.github.thatsmusic99.hitwtracker.HITWTracker;
 import io.github.thatsmusic99.hitwtracker.game.Statistic;
 import io.github.thatsmusic99.hitwtracker.serializer.StatisticSerializer;
 import io.github.thatsmusic99.hitwtracker.util.GameSaver;
+import io.github.thatsmusic99.hitwtracker.util.MiscUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -602,7 +603,7 @@ public class StatisticManager {
                             int walls,
                             short averageTime,
                             short fastestTime) {
-            this.map = capitalise(map);
+            this.map = MiscUtils.capitalise(map);
             this.games = games;
             this.avgPlacement = avgPlacement;
             this.deaths = deaths;
@@ -657,11 +658,6 @@ public class StatisticManager {
             }
 
             return maxResult;
-        }
-
-        private static String capitalise(String name) {
-            if (name.isEmpty()) return name;
-            return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
         }
 
         public @NotNull String getMap() {
@@ -739,6 +735,10 @@ public class StatisticManager {
             return this.maps.getOrDefault(map.toLowerCase(), 0);
         }
 
+        public Set<String> getTiedMaps() {
+            return this.maps.keySet();
+        }
+
         protected void add(final @NotNull String map) {
             int count = getMapCount(map);
             count++;
@@ -759,5 +759,32 @@ public class StatisticManager {
         if (profile.isEmpty()) return player;
 
         return profile.get().getName();
+    }
+
+    private class PendingData<T> {
+
+        private T value;
+        private CompletableFuture<T> future;
+
+        public PendingData() {
+            this.value = null;
+            this.future = null;
+        }
+
+        public CompletableFuture<T> request(final CompletableFuture<T> future) {
+            if (this.value == null) {
+                if (this.future == null) {
+                    this.future = future;
+
+                    this.future.whenComplete((value, err) -> this.value = value);
+
+                    return this.future = future;
+                } else {
+                    return this.future;
+                }
+            }
+
+            return CompletableFuture.completedFuture(value);
+        }
     }
 }
