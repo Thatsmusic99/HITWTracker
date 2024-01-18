@@ -98,7 +98,7 @@ public abstract class EntryListTab<E extends AlwaysSelectedEntryListWidget.Entry
 
         final var textWidget = new OrderableColumn(mutableText, comparator);
 
-        textWidget.setWidth(Math.max(40, textWidget.getWidth()));
+        textWidget.setWidth(Math.max(40, textWidget.getWidth() + 20));
 
         return textWidget;
     }
@@ -191,7 +191,10 @@ public abstract class EntryListTab<E extends AlwaysSelectedEntryListWidget.Entry
 
             // Get the difference in width
             int deltaWidth = column.getWidth() - widget.getWidth();
-            if (deltaWidth < 0) return column.getX();
+            if (deltaWidth < 0) {
+                column.setWidth(widget.getWidth());
+                return column.getX();
+            }
 
             // Half and set position
             return deltaWidth / 2 + column.getX();

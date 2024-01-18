@@ -88,6 +88,8 @@ public class TieStatisticsTab extends EntryListTab<TieStatisticsTab.Entry> {
 
             context.drawTexture(HITWTrackerClient.get().getProfileManager().get(stat.getPlayer()),
                     PLAYER_COLUMN.getX() - 16, y, 0, 0, 8, 8, 8, 8);
+
+            grid.refreshPositions();
         }
     }
 }
