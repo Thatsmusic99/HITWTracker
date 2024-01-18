@@ -642,6 +642,7 @@ public class StatisticManager {
             String maxResult = null;
 
             for (String str : list) {
+                if (str.isEmpty()) continue;
                 int count = 1;
                 if (counts.containsKey(str)) {
                     count = counts.get(str) + 1;
