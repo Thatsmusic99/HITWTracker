@@ -99,13 +99,14 @@ public class ProfileManager {
             RenderSystem.recordRenderCall(() -> {
                 TextureUtil.prepareImage(texture.getGlId(), image.getWidth(), image.getHeight());
                 texture.upload();
+
+                final Identifier id = new Identifier("hitwtracker", "player_" + name.toLowerCase());
+
+                MinecraftClient.getInstance().getTextureManager().registerTexture(id, texture);
+                idCache.put(name, id);
+                waiting.remove(name);
             });
 
-            final Identifier id = new Identifier("hitwtracker", "player_" + name.toLowerCase());
-
-            MinecraftClient.getInstance().getTextureManager().registerTexture(id, texture);
-            idCache.put(name, id);
-            waiting.remove(name);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
