@@ -760,31 +760,4 @@ public class StatisticManager {
 
         return profile.get().getName();
     }
-
-    private class PendingData<T> {
-
-        private T value;
-        private CompletableFuture<T> future;
-
-        public PendingData() {
-            this.value = null;
-            this.future = null;
-        }
-
-        public CompletableFuture<T> request(final CompletableFuture<T> future) {
-            if (this.value == null) {
-                if (this.future == null) {
-                    this.future = future;
-
-                    this.future.whenComplete((value, err) -> this.value = value);
-
-                    return this.future = future;
-                } else {
-                    return this.future;
-                }
-            }
-
-            return CompletableFuture.completedFuture(value);
-        }
-    }
 }
