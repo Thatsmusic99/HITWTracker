@@ -6,3 +6,8 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+include("HITWTracker-1.20.2")
+include("HITWTracker-1.20.1")
+include("HITWTracker-1.19.4")
+include("HITWTracker-Sheets")
+include("HITWTracker-Common")

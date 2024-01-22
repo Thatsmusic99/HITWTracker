@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "hitwtracker",
+  "version": "${version}",
+  "name": "HITWTracker",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "LGPL-3.0",
+  "icon": "assets/HITWTracker/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "io.github.thatsmusic99.hitwtracker.client.HITWTrackerClient"
+    ],
+    "main": [
+      "io.github.thatsmusic99.hitwtracker.HITWTracker"
+    ]
+  },
+  "mixins": [
+    "HITWTracker.mixins.json"
+  ],
+  "accessWidener": "hitwtracker.accesswidener",
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "${minecraft_version}"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "hud.tracking": "Tracking",
+  "statistics.hitw.all.game": "Game",
+  "statistics.hitw.all.placement": "Placement",
+  "statistics.hitw.all.ties": "Ties",
+  "statistics.hitw.all.deathcause": "Death Cause",
+  "statistics.hitw.all.time": "Time",
+  "statistics.hitw.all.walls": "Walls",
+  "statistics.hitw.all.map": "Map",
+  "statistics.hitw.all.date": "Date"
+}

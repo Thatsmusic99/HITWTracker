@@ -1,0 +1,115 @@
+plugins {
+    id("fabric-loom") version("1.0-SNAPSHOT")
+    id("maven-publish")
+}
+
+version = project.property("mod_version")!!
+group = project.property("maven_group")!!
+
+repositories {
+}
+
+dependencies {
+    minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
+    mappings("net.fabricmc:yarn:${project.property("yarn_mappings")}:v2")
+    modImplementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
+
+    // Fabric API. This is technically optional, but you probably want it anyway.
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
+
+    implementation(project(":HITWTracker-Common"))
+}
+
+loom {
+    accessWidenerPath.set(file("src/main/resources/hitwtracker.accesswidener"))
+}
+
+project.evaluationDependsOn(":HITWTracker-Common")
+
+sourceSets {
+    named("main") {
+        resources {
+            srcDir(project(":HITWTracker-Common").sourceSets.main.get().resources)
+        }
+    }
+}
+
+
+var targetJavaVersion = 17
+
+tasks.jar {
+
+    from(sourceSets.main.get().output)
+    from(project(":HITWTracker-Common").sourceSets.main.get().output)
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks {
+    withType<JavaCompile> {
+        configureEach {
+            // ensure that the encoding is set to UTF-8, no matter what the system default is
+            // this fixes some edge cases with special characters not displaying correctly
+            // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
+            // If Javadoc is generated, this must be specified in that task too.
+            options.encoding = "UTF-8"
+            if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+                options.release.set(targetJavaVersion)
+            }
+
+            source(project(":HITWTracker-Common").sourceSets["main"].allSource)
+        }
+    }
+
+    processResources {
+        dependsOn(project(":HITWTracker-Common").tasks.processResources)
+        inputs.property("version", project.version)
+        inputs.property("minecraft_version", project.property("minecraft_version"))
+        inputs.property("loader_version", project.property("loader_version"))
+        filteringCharset = "UTF-8"
+
+        filesMatching("fabric.mod.json") {
+            expand(Pair("version", project.version),
+                Pair("minecraft_version", project.property("minecraft_version")),
+                Pair("loader_version", project.property("loader_version")))
+        }
+    }
+
+    jar {
+        dependsOn(project(":HITWTracker-Common").tasks.jar)
+        from("LICENSE") {
+            rename { "${it}_${project.base.archivesName}"}
+        }
+    }
+
+    publishing {
+        /* publications {
+            mavenJava<MavenPublication> {
+                from(components.java)
+            }
+        } */
+
+        // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+        repositories {
+            // Add repositories to publish to here.
+            // Notice: This block does NOT have the same function as the block in the top level.
+            // The repositories here will be used for publishing your artifact, not for
+            // retrieving dependencies.
+        }
+    }
+}
+
+java {
+    val javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
+    }
+    base {
+        archivesName.set(project.property("archives_base_name") as String)
+    }
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+    // if it is present.
+    // If you remove this line, sources will not be generated.
+    withSourcesJar()
+}
+

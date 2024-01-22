@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "io.github.thatsmusic99.hitwtracker.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "LivingEntityMixin"
+  ],
+  "client": [
+    "ChatHudMixin",
+    "ClientPlayerEntityMixin",
+    "ClientPlayNetworkHandlerMixin",
+    "CobwebBlockMixin",
+    "EntityMixin",
+    "FishingBobberEntityMixin",
+    "InGameHudMixin",
+    "MinecraftClientMixin",
+    "ScreenMixin",
+    "StatsScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
