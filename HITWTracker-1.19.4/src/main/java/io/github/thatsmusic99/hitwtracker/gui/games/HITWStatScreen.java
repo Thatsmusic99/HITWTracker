@@ -1,8 +1,8 @@
 package io.github.thatsmusic99.hitwtracker.gui.games;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.thatsmusic99.hitwtracker.gui.games.tab.*;
-import io.github.thatsmusic99.hitwtracker.gui.tab.LenientTabManager;
+import io.github.thatsmusic99.hitwtracker.gui.EntryListTab;
+import io.github.thatsmusic99.hitwtracker.gui.tab.*;
 import io.github.thatsmusic99.hitwtracker.mixin.ScreenMixin;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screen.Screen;
@@ -22,6 +22,7 @@ public class HITWStatScreen extends Screen {
 
     public static final Identifier LIGHT_DIRT_BACKGROUND_TEXTURE = new Identifier("textures/gui/light_dirt_background.png");
     public static final Identifier FOOTER_SEPARATOR_TEXTURE = new Identifier("textures/gui/footer_separator.png");
+    private static HITWStatScreen instance;
     private final @NotNull TabManager tabManager = new LenientTabManager<>(this, this::addDrawableChild, this::remove);
     private final @NotNull Screen parent;
     private TabNavigationWidget tabNavigationWidget;
@@ -30,6 +31,8 @@ public class HITWStatScreen extends Screen {
     public HITWStatScreen(final @NotNull Screen parent) {
         super(Text.of("Hole in the Brain"));
         this.parent = parent;
+
+        instance = this;
     }
 
     @Override
@@ -38,12 +41,12 @@ public class HITWStatScreen extends Screen {
         // Draw the tab navigator
         this.tabNavigationWidget = TabNavigationWidget
                 .builder(this.tabManager, this.width)
-                .tabs(new AllMatchesTab(this.client, this, 66, this.height - 36, 10),
-                        new DayStatisticsTab(this.client, this, 66, this.height - 36, 10),
-                        new DeathStatisticsTab(this.client, this, 66, this.height - 36),
-                        new MapStatisticsTab(this.client, this, 66, this.height - 36),
-                        new MiscStatisticsTab(this.client, this, 66, this.height - 36),
-                        new TieStatisticsTab(this.client, this, 66, this.height - 36))
+                .tabs((EntryListTab<?, ?>) new AllGamesTabContainer().getTab(),
+                        (EntryListTab<?, ?>) new DayStatsTabContainer().getTab(),
+                        (EntryListTab<?, ?>) new DeathStatsTabContainer().getTab(),
+                        (EntryListTab<?, ?>) new MapStatsTabContainer().getTab(),
+                        (EntryListTab<?, ?>) new MiscStatsTabContainer().getTab(),
+                        (EntryListTab<?, ?>) new TieStatsTabContainer().getTab())
                 .build();
         this.addDrawableChild(this.tabNavigationWidget);
 
@@ -121,5 +124,9 @@ public class HITWStatScreen extends Screen {
     @Override
     public void remove(Element child) {
         super.remove(child);
+    }
+
+    public static HITWStatScreen get() {
+        return instance;
     }
 }

@@ -2,6 +2,7 @@ package io.github.thatsmusic99.hitwtracker;
 
 import io.github.thatsmusic99.hitwtracker.api.IModCore;
 import io.github.thatsmusic99.hitwtracker.gui.GuiManager;
+import io.github.thatsmusic99.hitwtracker.gui.GuiManagerImpl;
 import io.github.thatsmusic99.hitwtracker.impl.HGameProfile;
 import io.github.thatsmusic99.hitwtracker.impl.HPlayerEntity;
 import io.github.thatsmusic99.hitwtracker.manager.IPlayerManager;
@@ -19,6 +20,7 @@ public class HITWTracker implements ModInitializer, IModCore<HGameProfile, HPlay
     private static HITWTracker instance;
     private StatisticManager statsManager;
     private PlayerManager playerManager;
+    private GuiManager guiManager;
 
     /**
      * Runs the mod initializer.
@@ -28,6 +30,7 @@ public class HITWTracker implements ModInitializer, IModCore<HGameProfile, HPlay
         instance = this;
         this.statsManager = new StatisticManager();
         this.playerManager = new PlayerManager();
+        this.guiManager = new GuiManagerImpl();
 
         CoreContainer.setInstance(this);
     }
@@ -47,6 +50,6 @@ public class HITWTracker implements ModInitializer, IModCore<HGameProfile, HPlay
 
     @Override
     public @NotNull GuiManager getGuiManager() {
-        return null;
+        return this.guiManager;
     }
 }

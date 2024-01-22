@@ -2,6 +2,7 @@ package io.github.thatsmusic99.hitwtracker.mixin;
 
 import com.mojang.authlib.GameProfile;
 import io.github.thatsmusic99.hitwtracker.game.GameTracker;
+import io.github.thatsmusic99.hitwtracker.game.Trap;
 import io.github.thatsmusic99.hitwtracker.util.interfaces.*;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SandBlock;
@@ -30,18 +31,31 @@ import java.util.TimerTask;
 public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity implements DamageTracking<DamageSource>,
         VelocityTracking, HotPotatoTracking, CobwebTracking, StatusTracking<StatusEffect> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClientPlayerEntityMixin.class);
-    private long lastInAir = System.currentTimeMillis() / 50;
-    private @Nullable DamageSource source;
-    private @Nullable VelocityStatus velocity;
-    private @Nullable Timer cobwebTimer;
-    private boolean hotPotatoTracker = false;
-    private boolean explosion = false;
-    private boolean launched = false;
-    private byte count = 0;
+    private static final @Unique Logger LOGGER = LoggerFactory.getLogger(ClientPlayerEntityMixin.class);
+    private @Unique long lastInAir = System.currentTimeMillis() / 50;
+    private @Unique @Nullable DamageSource source;
+    private @Unique @Nullable VelocityStatus velocity;
+    private @Unique @Nullable StatusEffect effect;
+    private @Unique byte count = 0;
+    private @Unique @Nullable Timer cobwebTimer;
+    private @Unique boolean hotPotatoTracker = false;
+    private @Unique boolean explosion = false;
+    private @Unique boolean launched = false;
 
     public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile) {
         super(world, profile);
+    }
+
+    @Override
+    public void gameTracker$onDamage(DamageSource damageSource) {
+        LOGGER.info("Damage tracked");
+        if (!GameTracker.isTracking()) return;
+        if (damageSource == null) return;
+        LOGGER.info("Game is tracking");
+        source = damageSource;
+        count = 1;
+        lastInAir = System.currentTimeMillis() / 50;
+        LOGGER.info("Damage source: " + source + ", " + Trap.getTrap(() -> this));
     }
 
     @Override
@@ -67,11 +81,17 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         checkSandfall();
         if (this.source == null && this.velocity == null) return;
 
-        if (changedGround || System.currentTimeMillis() / 50 - this.lastInAir > 60) {
+        boolean onGroundTooLong = System.currentTimeMillis() / 50 - this.lastInAir > 60;
+        if (onGroundTooLong) {
+            gameTracker$flush();
+            LOGGER.info("Tracking wiped (ground)");
+            return;
+        }
+
+        if (changedGround && onGround) {
             if (this.count == 0) {
-                this.source = null;
-                this.velocity = null;
-                LOGGER.debug("Tracking wiped");
+                gameTracker$flush();
+                LOGGER.info("Tracking wiped");
             } else {
                 this.count = 0;
                 LOGGER.info("Tracking put down");
@@ -80,18 +100,10 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     }
 
     @Override
-    public void onDamaged(DamageSource damageSource) {
-        super.onDamaged(damageSource);
-        if (GameTracker.isTracking()) {
-            this.source = damageSource;
-            this.count = 1;
-        }
-    }
-
-    @Override
     public void gameTracker$onSandfall() {
         if (GameTracker.isTracking()) {
             this.velocity = VelocityStatus.SANDFALL;
+            this.lastInAir = System.currentTimeMillis() / 50;
             this.count = 1;
         }
     }
@@ -108,7 +120,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     public void gameTracker$flush() {
         this.source = null;
         this.velocity = null;
-        this.count = 0;
+        this.count = -1;
     }
 
     @Override
@@ -147,22 +159,12 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     }
 
     @Override
-    public void gameTracker$onExplosionSound() {
+    public void gameTracker$onExplosion() {
         if (GameTracker.isTracking() && this.hotPotatoTracker) {
-            this.explosion = true;
-            this.count = 1;
-            if (!this.launched) return;
             this.velocity = VelocityStatus.HOT_POTATO;
-        }
-    }
-
-    @Override
-    public void gameTracker$onExplosionLaunch() {
-        if (GameTracker.isTracking() && this.hotPotatoTracker) {
-            this.launched = true;
             this.count = 1;
-            if (!this.explosion) return;
-            this.velocity = VelocityStatus.HOT_POTATO;
+            this.lastInAir = System.currentTimeMillis() / 50;
+            LOGGER.info("Explosion tracked");
         }
     }
 
@@ -171,6 +173,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         if (GameTracker.isTracking()) {
             this.velocity = VelocityStatus.FISHING_RODS;
             this.count = 1;
+            this.lastInAir = System.currentTimeMillis() / 50;
             LOGGER.info("Rod pull tracked");
         }
     }
@@ -180,6 +183,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         if (GameTracker.isTracking()) {
             this.velocity = VelocityStatus.BLAST_OFF;
             this.count = 1;
+            this.lastInAir = System.currentTimeMillis() / 50;
             LOGGER.info("Blast-off tracked");
         }
     }
@@ -193,6 +197,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
             this.velocity = VelocityStatus.COBWEBS;
         }
         this.count = 1;
+        this.lastInAir = System.currentTimeMillis() / 50;
     }
 
     @Override
@@ -211,4 +216,41 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         return this.getBlockY();
     }
 
+    @Override
+    public boolean gameTracker$hadStatusEffect(@NotNull String namespace) {
+        return effect != null && Registries.STATUS_EFFECT.get(Identifier.splitOn(namespace, ':')) == effect;
+    }
+
+    @Override
+    public void gameTracker$applyStatusEffect(@NotNull StatusEffect effect) {
+        this.effect = effect;
+    }
+
+    @Override
+    public void gameTracker$onExplosionSound() {
+        if (GameTracker.isTracking() && this.hotPotatoTracker) {
+            this.explosion = true;
+            this.count = 1;
+            this.lastInAir = System.currentTimeMillis() / 50;
+            if (!this.launched) return;
+            this.velocity = VelocityStatus.HOT_POTATO;
+        }
+    }
+
+    @Override
+    public void gameTracker$onExplosionLaunch() {
+        if (GameTracker.isTracking() && this.hotPotatoTracker) {
+            this.launched = true;
+            this.count = 1;
+            this.lastInAir = System.currentTimeMillis() / 50;
+            if (!this.explosion) return;
+            this.velocity = VelocityStatus.HOT_POTATO;
+        }
+    }
+
+    @Override
+    public int gameTracker$getAmplifier(@NotNull String namespace) {
+        return gameTracker$hadStatusEffect(namespace) ?
+                (this.effect == null ? 0 : (getStatusEffect(effect) == null ? 0 : getStatusEffect(effect).getAmplifier())) : 0;
+    }
 }

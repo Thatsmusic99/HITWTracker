@@ -4,13 +4,14 @@
   "package": "io.github.thatsmusic99.hitwtracker.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "LivingEntityMixin"
   ],
   "client": [
     "ChatHudMixin",
-    "EntityMixin",
-    "CobwebBlockMixin",
     "ClientPlayerEntityMixin",
     "ClientPlayNetworkHandlerMixin",
+    "CobwebBlockMixin",
+    "EntityMixin",
     "FishingBobberEntityMixin",
     "InGameHudMixin",
     "MinecraftClientMixin",
