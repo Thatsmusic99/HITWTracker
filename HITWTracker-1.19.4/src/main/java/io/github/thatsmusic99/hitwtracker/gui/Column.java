@@ -33,13 +33,13 @@ public class Column<E, C extends IColumn<E>> extends TextWidget implements IColu
     public Column(final EntryListTab<E, C> tab,
                   final @NotNull String name,
                   final @NotNull Predicate<IEntry<E>> highlighted,
-                  final @Nullable Function<IEntry<E>, String> onHover,
-                  final @NotNull Function<IEntry<E>, String> toString,
+                  final @Nullable Function<IEntry<E>, @NotNull String> onHover,
+                  final @NotNull Function<IEntry<E>, @NotNull String> toString,
                   final @NotNull Comparator<IEntry<E>> comparator) {
         super(Text.of(name), MinecraftClient.getInstance().textRenderer);
         this.defaultMessage = Text.of(name);
-        this.messageUp = Text.literal(name + " \uD83D\uDD3C");
-        this.messageDown = Text.literal(name + " \uD83D\uDD3D");
+        this.messageUp = Text.literal(name + " ↑");
+        this.messageDown = Text.literal(name + " ↓");
 
         this.comparator = comparator;
         this.reverseComparator = comparator.reversed();
@@ -103,6 +103,10 @@ public class Column<E, C extends IColumn<E>> extends TextWidget implements IColu
             style = style.withColor(TextColor.fromRgb(0xffff66));
 
             return mutableText.setStyle(style);
+        }
+
+        if (this.toString.apply(entry) == null) {
+            System.out.println("brr");
         }
 
         return Text.literal(toString.apply(entry));

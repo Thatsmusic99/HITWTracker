@@ -15,7 +15,8 @@
     "InGameHudMixin",
     "MinecraftClientMixin",
     "ScreenMixin",
-    "StatsScreenMixin"
+    "StatsScreenMixin",
+    "LivingEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

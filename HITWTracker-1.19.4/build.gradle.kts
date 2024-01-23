@@ -14,7 +14,9 @@ repositories {
 dependencies {
     minecraft("com.mojang:minecraft:1.19.4")
     mappings("net.fabricmc:yarn:1.19.4+build.2:v2")
-    modImplementation("net.fabricmc:fabric-loader:0.14.16")
+    modImplementation("net.fabricmc:fabric-loader:0.14.21")
+
+    modImplementation("net.fabricmc.fabric-api:fabric-api:0.87.2+1.19.4")
 
     implementation(project(":HITWTracker-Common"))
 }
@@ -25,8 +27,12 @@ loom {
 
 project.evaluationDependsOn(":HITWTracker-Common")
 
-tasks.getByName<Test>("test") {
-    useJUnitPlatform()
+sourceSets {
+    named("main") {
+        resources {
+            srcDir(project(":HITWTracker-Common").sourceSets.main.get().resources)
+        }
+    }
 }
 
 tasks.jar {
@@ -56,6 +62,7 @@ tasks {
     }
 
     processResources {
+        dependsOn(project(":HITWTracker-Common").tasks.processResources)
         inputs.property("version", project.version)
         inputs.property("minecraft_version", minecraftVersion)
         inputs.property("loader_version", loaderVersion)
@@ -69,6 +76,7 @@ tasks {
     }
 
     jar {
+        dependsOn(project(":HITWTracker-Common").tasks.jar)
         from("LICENSE") {
             rename { "${it}_${project.base.archivesName}"}
         }

@@ -247,11 +247,11 @@ public class EntryListTab<T, C extends IColumn<T>> extends AbstractEntryListTab<
             this.index = index;
         }
 
-        protected void draw(DrawContext context, String text, TextWidget column, int y, int colour) {
+        protected void draw(DrawContext context, final @NotNull String text, TextWidget column, int y, int colour) {
             this.draw(context, Text.of(text), column, y, colour);
         }
 
-        protected void draw(DrawContext context, Text text, TextWidget column, int y, int colour) {
+        protected void draw(DrawContext context, final @NotNull Text text, TextWidget column, int y, int colour) {
             context.drawTextWithShadow(client.textRenderer, text, centre(text, column), y, colour);
         }
 

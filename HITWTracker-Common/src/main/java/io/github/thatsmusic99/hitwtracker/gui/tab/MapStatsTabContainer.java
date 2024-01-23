@@ -7,6 +7,7 @@ import io.github.thatsmusic99.hitwtracker.manager.StatisticManager;
 import io.github.thatsmusic99.hitwtracker.util.MiscUtils;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 public class MapStatsTabContainer {
 
@@ -33,7 +34,7 @@ public class MapStatsTabContainer {
                 Comparator.comparing(stat -> stat.getItem().getAvgPlacement())));
 
         this.tab.addColumn(this.tab.createColumn("Top Death Cause",
-                stat -> stat.getItem().getTopDeathCause(),
+                stat -> Objects.requireNonNullElse(stat.getItem().getTopDeathCause(), ""),
                 Comparator.comparing(stat -> stat.getItem().getTopDeathCause())));
 
         this.tab.addColumn(this.tab.createColumn("Ties",
@@ -45,7 +46,7 @@ public class MapStatsTabContainer {
                 Comparator.comparing(stat -> stat.getItem().getLargestTie())));
 
         this.tab.addColumn(this.tab.createColumn("Most Tied With",
-                stat -> stat.getItem().getMostTiedWith(),
+                stat -> Objects.requireNonNullElse(stat.getItem().getMostTiedWith(), ""),
                 Comparator.comparing(stat -> stat.getItem().getMostTiedWith())));
 
         this.tab.addColumn(this.tab.createColumn("Wins",
